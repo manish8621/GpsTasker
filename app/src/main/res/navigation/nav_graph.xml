@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/triggersFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.mk.gpstasker.view.HomeFragment"
+        android:label="HomeFragment" />
+    <fragment
+        android:id="@+id/triggersFragment"
+        android:name="com.mk.gpstasker.view.fragments.TriggersFragment"
+        android:label="TriggersFragment" >
+        <action
+            android:id="@+id/action_triggersFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.mk.gpstasker.view.fragments.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" >
+        <action
+            android:id="@+id/action_mapsFragment_to_triggerDetailFragment"
+            app:destination="@id/triggerDetailFragment"
+            app:popUpTo="@id/triggersFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/triggerDetailFragment"
+        android:name="com.mk.gpstasker.view.fragments.TriggerDetailFragment"
+        android:label="fragment_trigger_detail"
+        tools:layout="@layout/fragment_trigger_detail" >
+        <argument
+            android:name="lattitude"
+            app:argType="integer" />
+        <argument
+            android:name="longitude"
+            app:argType="integer" />
+    </fragment>
+</navigation>

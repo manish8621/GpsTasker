@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:context=".view.fragments.MapsFragment" />
+
+        <ImageView
+            android:id="@+id/default_view_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/highlight_bg_a"
+            android:padding="2dp"
+            android:src="@drawable/ic_default"
+            android:tag="selected"
+            app:layout_constraintBottom_toBottomOf="@+id/satellite_view_btn"
+            app:layout_constraintEnd_toStartOf="@+id/satellite_view_btn"
+            app:layout_constraintTop_toTopOf="@+id/satellite_view_btn" />
+
+        <TextView
+            android:id="@+id/default_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="default"
+            android:textColor="#007BB3"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/default_view_btn"
+            app:layout_constraintStart_toStartOf="@+id/default_view_btn"
+            app:layout_constraintTop_toBottomOf="@+id/default_view_btn" />
+
+        <TextView
+            android:id="@+id/satilite_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="sattilite"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/satellite_view_btn"
+            app:layout_constraintStart_toStartOf="@+id/satellite_view_btn"
+            app:layout_constraintTop_toBottomOf="@+id/satellite_view_btn" />
+
+        <ImageView
+            android:id="@+id/satellite_view_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:padding="2dp"
+            android:src="@drawable/sattilite"
+            android:tag=""
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/map_type_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="default_tv,satellite_view_btn,default_view_btn,satilite_tv"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <ImageView
+            android:id="@+id/done_btn"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:padding="3dp"
+            android:src="@drawable/ic_baseline_done"
+            android:background="@drawable/round_bg"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
