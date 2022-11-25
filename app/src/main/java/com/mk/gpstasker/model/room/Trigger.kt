@@ -1,12 +1,38 @@
 package com.mk.gpstasker.model.room
 
-data class Trigger(val id:Int,val location:Location,val triggerAction:String){
+import androidx.navigation.NavType
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+
+@Entity(tableName = "trigger_table")
+data class Trigger(
+    @PrimaryKey(autoGenerate = true)
+    val id:Long=0L,
+
+    @Embedded
+    val location:Location,
+
+    val triggerAction:String,
+
+    val label:String
+
+    ):java.io.Serializable
+{
     companion object{
+
         val ACTION_SILENCE = "ACTION_SILENCE"
-        val ACTION_ALERT = "ACTION_SILENCE"
+        val ACTION_ALERT = "ACTION_ALERT"
         //TODO:Add extra features
         val ACTION_OTHER = "ACTION_?"
 
     }
 }
-data class Location(val latitude:Double, val longitude:Double, val name:String)
+
+
+data class Location(
+    val latitude:Double,
+    val longitude:Double,
+    val radius:Float
+    ):java.io.Serializable

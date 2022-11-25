@@ -30,7 +30,7 @@ import com.mk.gpstasker.viewmodel.HomeViewModel
 
 
 //TODO:make it top level const
-val GPS_UPDATE_INTERVEL= 2000L
+val GPS_UPDATE_INTERVEL= 500L
 
 class HomeFragment : Fragment() {
 

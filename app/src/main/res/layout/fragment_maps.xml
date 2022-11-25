@@ -4,18 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="com.mk.gpstasker.viewmodel.MapsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/primary">
 
         <fragment
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/fetch_location_btn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -30,6 +35,7 @@
             android:padding="2dp"
             android:src="@drawable/ic_default"
             android:tag="selected"
+            android:layout_marginEnd="8dp"
             app:layout_constraintBottom_toBottomOf="@+id/satellite_view_btn"
             app:layout_constraintEnd_toStartOf="@+id/satellite_view_btn"
             app:layout_constraintTop_toTopOf="@+id/satellite_view_btn" />
@@ -39,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="default"
-            android:textColor="#007BB3"
+            android:textColor="@color/primary_sat_highlight"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="@+id/default_view_btn"
             app:layout_constraintStart_toStartOf="@+id/default_view_btn"
@@ -50,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="sattilite"
-            android:textColor="@color/black"
+            android:textColor="@color/on_primary"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="@+id/satellite_view_btn"
             app:layout_constraintStart_toStartOf="@+id/satellite_view_btn"
@@ -73,26 +79,64 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="default_tv,satellite_view_btn,default_view_btn,satilite_tv"
+            app:constraint_referenced_ids="default_tv,satellite_view_btn,default_view_btn,satilite_tv,fetch_location_btn"
             app:layout_constraintBottom_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
 
         <ImageView
             android:id="@+id/done_btn"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:padding="3dp"
-            android:src="@drawable/ic_baseline_done"
-            android:background="@drawable/round_bg"
-            android:visibility="gone"
-            android:layout_marginBottom="16dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/round_bg"
+            android:padding="13dp"
+            android:src="@drawable/ic_baseline_done"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+
+        <ImageView
+            android:id="@+id/fetch_location_btn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/round_bg"
+            android:padding="13dp"
+            android:src="@drawable/ic_baseline_my_location"
+            app:layout_constraintBottom_toTopOf="@+id/done_btn"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/rangeSlider"
+
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/fetch_location_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/map" />
+
+        <TextView
+            android:id="@+id/radius_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Radius"
+            app:layout_constraintStart_toStartOf="@+id/rangeSlider"
+            app:layout_constraintTop_toBottomOf="@+id/rangeSlider" />
+
+        <TextView
+            android:id="@+id/radius_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.01 km"
+            app:layout_constraintEnd_toEndOf="@+id/rangeSlider"
+            app:layout_constraintTop_toBottomOf="@+id/rangeSlider" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

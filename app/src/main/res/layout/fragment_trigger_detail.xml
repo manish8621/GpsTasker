@@ -4,23 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="com.mk.gpstasker.viewmodel.TriggerDetailViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp"
+        android:background="@color/primary"
         tools:context=".view.fragments.TriggerDetailFragment">
 
         <TextView
             android:id="@+id/select_trigger_action_tv"
+            style="@style/titleTextSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
             android:text="@string/select_trigger_action"
             android:textColor="@color/black"
             android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/silent_iv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/label_et" />
@@ -40,11 +46,13 @@
 
         <TextView
             android:id="@+id/silent_tv"
+            style="@style/valueTextSmall"
             android:layout_width="wrap_content"
+
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/silent"
-            android:textColor="@color/black"
+
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@+id/silent_iv"
             app:layout_constraintStart_toStartOf="@+id/silent_iv"
@@ -63,11 +71,11 @@
 
         <TextView
             android:id="@+id/alert_tv"
+            style="@style/valueTextSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Alert"
-            android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@+id/alert_iv"
             app:layout_constraintStart_toStartOf="@+id/alert_iv"
@@ -75,6 +83,7 @@
 
         <TextView
             android:id="@+id/label_tv"
+            style="@style/titleTextSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/trigger_label"
@@ -83,18 +92,28 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+<!--TODO:add material edit text        -->
+
         <EditText
             android:id="@+id/label_et"
+            style="@style/valueText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="@string/trigger_label"
-            app:layout_constraintTop_toBottomOf="@+id/label_tv"
-            tools:layout_editor_absoluteX="16dp" />
+            android:text="@={viewModel.triggerLabel}"
+            android:textColorHighlight="@color/on_primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/label_tv" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/add_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:cornerRadius="25dp"
             android:text="@string/add_trigger"
+            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

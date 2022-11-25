@@ -4,8 +4,8 @@
     <solid
         android:color="@color/white"/>
     <stroke
-        android:color="@color/black"
-        android:width="5dp"
+        android:color="@color/primary_sat_highlight"
+        android:width="2dp"
         />
 
 </shape>

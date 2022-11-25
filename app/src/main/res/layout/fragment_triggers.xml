@@ -9,42 +9,60 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
+        android:paddingTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="@color/primary"
         tools:context=".view.fragments.TriggersFragment">
 
-        <TextView
-            android:id="@+id/title_tv"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_tb"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/app_ico_iv"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:src="@drawable/gps_ico"
+                android:layout_marginEnd="8dp"/>
+            <TextView
+                android:id="@+id/title_tv"
+                style="@style/titleTextLev1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:layout_marginStart="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/new_trigger_btn"
+                style="@style/titleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:textColor="@color/white"
+                android:text="@string/new_trigger"
+                app:cornerRadius="20dp" />
+
+        </androidx.appcompat.widget.Toolbar>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/triggers_recycler_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title_tv"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/new_trigger_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="new trigger"
-            app:cornerRadius="10dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_tb" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

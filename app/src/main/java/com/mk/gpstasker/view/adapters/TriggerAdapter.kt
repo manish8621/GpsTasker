@@ -5,32 +5,65 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.mk.gpstasker.R
 import com.mk.gpstasker.databinding.TriggerItemLayoutBinding
+import com.mk.gpstasker.format
 import com.mk.gpstasker.model.room.Trigger
 
 class TriggerAdapter:ListAdapter<Trigger,TriggerAdapter.ItemViewHolder>(DiffutilItemCallback()) {
+    private var clickListeners:ClickListeners? = null
+
     class ItemViewHolder(private val binding: TriggerItemLayoutBinding):RecyclerView.ViewHolder(binding.root) {
         companion object{
-            fun from(parent: ViewGroup):ItemViewHolder{
+            fun from(parent: ViewGroup,clickListeners: ClickListeners?):ItemViewHolder{
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = TriggerItemLayoutBinding.inflate(layoutInflater,parent,false)
+
+                //add click listeners
+                binding.actionBtn.setOnClickListener{
+                    binding.trigger?.let {
+                        clickListeners?.onStartClicked(it)
+                    }
+                }
+                binding.deleteBtn.setOnClickListener{
+                    binding.trigger?.let {
+                        clickListeners?.onDeleteClicked(it)
+                    }
+                }
+
                 return ItemViewHolder(binding)
             }
         }
         fun bind(trigger:Trigger)
         {
-            binding.locationLabelTv.text = trigger.location.name
-            binding.locationCoOrdTv.text = "lat:"+trigger.location.latitude +"\nlon:"+ trigger.location.longitude
+            binding.trigger = trigger
+            binding.latitudeTv.text = trigger.location.latitude.format(3)
+            binding.longitudeTv.text = trigger.location.longitude.format(3)
+
+            when(trigger.triggerAction){
+                Trigger.ACTION_SILENCE -> binding.triggerIv.setImageResource(R.drawable.vibration_white)
+                Trigger.ACTION_ALERT -> binding.triggerIv.setImageResource(R.drawable.alert_white)
+                else -> binding.triggerIv.setImageResource(R.drawable.ic_launcher_foreground)
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-        return ItemViewHolder.from(parent)
+        return ItemViewHolder.from(parent,clickListeners)
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         return holder.bind(getItem(position))
     }
+    interface ClickListeners{
+        fun onStartClicked(trigger: Trigger)
+        fun onDeleteClicked(trigger: Trigger)
+    }
+
+    fun setClickListeners(clickListeners: ClickListeners){
+        this.clickListeners = clickListeners
+    }
+
 }
 class DiffutilItemCallback: DiffUtil.ItemCallback<com.mk.gpstasker.model.room.Trigger>() {
     override fun areItemsTheSame(oldItem: Trigger, newItem: Trigger): Boolean {

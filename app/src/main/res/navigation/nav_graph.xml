@@ -16,6 +16,12 @@
         <action
             android:id="@+id/action_triggersFragment_to_mapsFragment"
             app:destination="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_triggersFragment_to_triggerListenFragment"
+            app:destination="@id/triggerListenFragment" />
+        <action
+            android:id="@+id/action_triggersFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/mapsFragment"
@@ -33,10 +39,15 @@
         android:label="fragment_trigger_detail"
         tools:layout="@layout/fragment_trigger_detail" >
         <argument
-            android:name="lattitude"
-            app:argType="integer" />
+            android:name="location"
+            app:argType="com.mk.gpstasker.model.room.Location" />
+    </fragment>
+    <fragment
+        android:id="@+id/triggerListenFragment"
+        android:name="com.mk.gpstasker.view.fragments.TriggerListenFragment"
+        android:label="TriggerListenFragment" >
         <argument
-            android:name="longitude"
-            app:argType="integer" />
+            android:name="trigger"
+            app:argType="com.mk.gpstasker.model.room.Trigger" />
     </fragment>
 </navigation>

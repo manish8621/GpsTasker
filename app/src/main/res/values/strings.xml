@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GpsTasker</string>
+    <string name="app_name">GPS Tasker</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="add_trigger">add trigger</string>
@@ -7,4 +7,6 @@
     <string name="select_trigger_action">Select trigger action</string>
     <string name="alert">alert</string>
     <string name="trigger_label">Trigger label</string>
+    <string name="radius">%.2f km</string>
+    <string name="new_trigger">new trigger</string>
 </resources>

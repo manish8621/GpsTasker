@@ -2,15 +2,46 @@
     <!-- Base application theme. -->
     <style name="Theme.GpsTasker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimary">@color/primary_sat_highlight</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorSecondary">@color/on_primary</item>
+        <item name="colorSecondaryVariant">@color/on_primary</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">@color/primary</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/primary</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
         <!-- Customize your theme here. -->
+        <item name="fontFamily">@font/poppins_medium</item>
+    </style>/
+
+
+    <style name="titleTextLev1">
+        <item name="android:fontFamily">@font/poppins_extrabold</item>
+        <item name="android:textColor">@color/on_primary</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="titleText">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="android:textColor">@color/on_primary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="titleTextSmall">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="android:textColor">@color/on_primary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="valueText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/on_primary</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+    </style>
+    <style name="valueTextSmall">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/on_primary</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
     </style>
 </resources>
