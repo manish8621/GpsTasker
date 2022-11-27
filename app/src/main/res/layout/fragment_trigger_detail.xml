@@ -12,9 +12,57 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         android:background="@color/primary"
         tools:context=".view.fragments.TriggerDetailFragment">
+
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_tb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/up_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="@color/primary"
+                android:contentDescription="@string/up_button"
+                android:padding="0dp"
+                app:srcCompat="?attr/homeAsUpIndicator" />
+
+            <ImageView
+                android:id="@+id/app_ico_iv"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/app_icon"
+                android:src="@drawable/gps_ico" />
+
+            <TextView
+                android:id="@+id/title_tv"
+                style="@style/titleTextLev1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gps_tasker_listen_to_trigger" />
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <TextView
+            android:id="@+id/label_tv"
+            style="@style/titleTextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/trigger_label"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/startGuide"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_tb" />
 
         <TextView
             android:id="@+id/select_trigger_action_tv"
@@ -27,8 +75,8 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/silent_iv"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/endGuide"
+            app:layout_constraintStart_toStartOf="@+id/startGuide"
             app:layout_constraintTop_toBottomOf="@+id/label_et" />
 
         <ImageView
@@ -37,12 +85,12 @@
             android:layout_height="150dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/highlight_bg_a"
-            android:tag="selected"
+            android:contentDescription="@string/silent"
             android:padding="10dp"
             android:src="@drawable/ic_baseline_vibration_24"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/select_trigger_action_tv"
-            android:contentDescription="@string/silent" />
+            android:tag="selected"
+            app:layout_constraintStart_toStartOf="@+id/startGuide"
+            app:layout_constraintTop_toBottomOf="@+id/select_trigger_action_tv" />
 
         <TextView
             android:id="@+id/silent_tv"
@@ -63,11 +111,11 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_marginTop="16dp"
+            android:contentDescription="@string/alert"
             android:padding="10dp"
             android:src="@drawable/ic_baseline_phonelink_ring_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/select_trigger_action_tv"
-            android:contentDescription="@string/alert" />
+            app:layout_constraintEnd_toStartOf="@+id/endGuide"
+            app:layout_constraintTop_toBottomOf="@+id/select_trigger_action_tv" />
 
         <TextView
             android:id="@+id/alert_tv"
@@ -81,42 +129,48 @@
             app:layout_constraintStart_toStartOf="@+id/alert_iv"
             app:layout_constraintTop_toBottomOf="@+id/alert_iv" />
 
-        <TextView
-            android:id="@+id/label_tv"
-            style="@style/titleTextSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/trigger_label"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
-<!--TODO:add material edit text        -->
+        <!--TODO:add material edit text        -->
 
         <EditText
             android:id="@+id/label_et"
             style="@style/valueText"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:hint="@string/trigger_label"
+            android:lines="1"
             android:text="@={viewModel.triggerLabel}"
             android:textColorHighlight="@color/on_primary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/label_tv" />
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/endGuide"
+            app:layout_constraintStart_toStartOf="@+id/startGuide"
+            app:layout_constraintTop_toBottomOf="@+id/label_tv"
+            android:autofillHints="Home|Office" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/add_btn"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:cornerRadius="25dp"
             android:text="@string/add_trigger"
             android:textColor="@color/white"
+            app:cornerRadius="25dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toStartOf="@+id/endGuide"
+            app:layout_constraintStart_toStartOf="@+id/startGuide" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/startGuide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="16dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/endGuide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="16dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

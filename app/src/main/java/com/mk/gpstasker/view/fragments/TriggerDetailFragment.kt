@@ -20,7 +20,7 @@ import com.mk.gpstasker.model.room.Trigger
 import com.mk.gpstasker.viewmodel.TriggerDetailViewModel
 import com.mk.gpstasker.viewmodel.TriggersDetailViewModelFactory
 
-
+//TODO:add more actions
 class TriggerDetailFragment : Fragment() {
     val args:TriggerDetailFragmentArgs by navArgs()
 

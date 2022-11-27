@@ -4,12 +4,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
-import com.mk.gpstasker.MinRadius
+import com.mk.gpstasker.model.MinRadius
 import com.mk.gpstasker.model.room.Location
 
 class MapsViewModel:ViewModel() {
-    //state
+    //states
     var mapMode = GoogleMap.MAP_TYPE_NORMAL
+    val uiStates = UiStates()
+
 
     val radius = MutableLiveData(MinRadius)
 
@@ -29,5 +31,8 @@ class MapsViewModel:ViewModel() {
     }
     fun getLocation():Location{
         return Location(getLattitude(),getLongitude(),requireRadius())
+    }
+    class UiStates{
+        var isSentToSettings = false
     }
 }

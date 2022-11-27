@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mk.gpstasker.R
 import com.mk.gpstasker.databinding.TriggerItemLayoutBinding
-import com.mk.gpstasker.format
+import com.mk.gpstasker.model.format
 import com.mk.gpstasker.model.room.Trigger
 
 class TriggerAdapter:ListAdapter<Trigger,TriggerAdapter.ItemViewHolder>(DiffutilItemCallback()) {

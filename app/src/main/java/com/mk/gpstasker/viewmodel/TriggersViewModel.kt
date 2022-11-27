@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 
 class TriggersViewModel(val repository: TriggersRepository) : ViewModel() {
 
+    val uiStates=UiStates()
     val triggerList = repository.getTriggers()
 //    fun addTrigger(lat:Double,lng:Double){
 //        //add to db via repo
@@ -24,11 +25,15 @@ class TriggersViewModel(val repository: TriggersRepository) : ViewModel() {
 //            }
 //        }
 //    }
+    var lastSelectedTrigger:Trigger? = null
     fun deleteTrigger(trigger: Trigger){
        viewModelScope.launch {
            withContext(Dispatchers.IO){
                repository.deleteTrigger(trigger)
            }
        }
+    }
+    class UiStates{
+        var  isSentToSettings = false
     }
 }

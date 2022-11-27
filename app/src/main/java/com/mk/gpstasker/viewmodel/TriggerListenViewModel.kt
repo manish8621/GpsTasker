@@ -18,8 +18,9 @@ class TriggerListenViewModel(val trigger: Trigger):ViewModel() {
     val currentLocation : LiveData<Location>
     get() = _currentLocation
 
+    val uiStates = UiStates()
+
     // kiloMeter
-    val radius = 0.010F
     var distance = 0.0
     private val oneDeg = Math.PI / 180
 
@@ -33,6 +34,7 @@ class TriggerListenViewModel(val trigger: Trigger):ViewModel() {
         _currentLocation.value?.let{ return LatLng(it.latitude,it.longitude) }
         return LatLng(trigger.location.latitude,trigger.location.longitude)
     }
+    fun getTargetLocation() = trigger.location
 
     fun storeCurrentLocation(location: Location)
     {
@@ -73,6 +75,9 @@ class TriggerListenViewModel(val trigger: Trigger):ViewModel() {
     //
     private fun Double.isInRange(min:Double,max:Double):Boolean{
         return (this in min..max)
+    }
+    class UiStates{
+        var isSentToSettings = false
     }
 }
 class TriggerListenViewModelFactory(private val trigger: Trigger): ViewModelProvider.Factory{

@@ -29,7 +29,7 @@ import com.mk.gpstasker.databinding.FragmentHomeBinding
 import com.mk.gpstasker.viewmodel.HomeViewModel
 
 
-//TODO:make it top level const
+//TODO:Delete this class or mark it as test class
 val GPS_UPDATE_INTERVEL= 500L
 
 class HomeFragment : Fragment() {
