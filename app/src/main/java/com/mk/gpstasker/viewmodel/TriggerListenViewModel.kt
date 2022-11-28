@@ -14,17 +14,18 @@ import kotlin.math.sin
 
 class TriggerListenViewModel(val trigger: Trigger):ViewModel() {
 
-    private val _currentLocation = MutableLiveData<Location>()
-    val currentLocation : LiveData<Location>
+    private val _currentLocation = MutableLiveData<LatLng>()
+    val currentLocation : LiveData<LatLng>
     get() = _currentLocation
 
     val uiStates = UiStates()
 
     // kiloMeter
-    var distance = 0.0
+    var distance = 0.0f
     private val oneDeg = Math.PI / 180
 
 
+    //TODO:REMOVE
     fun getAction() = trigger.triggerAction
 
     /**
@@ -34,52 +35,17 @@ class TriggerListenViewModel(val trigger: Trigger):ViewModel() {
         _currentLocation.value?.let{ return LatLng(it.latitude,it.longitude) }
         return LatLng(trigger.location.latitude,trigger.location.longitude)
     }
-    fun getTargetLocation() = trigger.location
 
-    fun storeCurrentLocation(location: Location)
+    fun storeCurrentLocation(location: LatLng)
     {
         _currentLocation.value = location
     }
-
-    fun isNearDestination():Boolean{
-        with(trigger.location) {
-            _currentLocation.value?.let {
-                distance = distanceBetween(LatLng(it.latitude,it.longitude),LatLng(latitude,longitude))
-                return (distance <= radius)
-            }
-        }
-        return false
-    }
-
-    fun distanceBetween(location1: LatLng,location2: LatLng):Double{
-        val l1Lat = toRadian(location1.latitude)
-        val l2Lat = toRadian(location2.latitude)
-        val l1Lng = toRadian(location1.longitude)
-        val l2Lng = toRadian(location2.longitude)
-        val dlat = l2Lat - l1Lat
-        val dlng = l2Lng - l1Lng
-
-        var d = Math.pow(sin(dlat/2), 2.0) + cos(l1Lat) * cos(l2Lat) * Math.pow(sin(dlng)/2,2.0)
-        d = 2 * asin(Math.sqrt(d))
-
-        //multiply with earth radius
-        d *= 6371
-
-        return d
-    }
-
-    private fun toRadian(dec:Double):Double{
-        return dec * oneDeg
-    }
-
-    //
-    private fun Double.isInRange(min:Double,max:Double):Boolean{
-        return (this in min..max)
-    }
     class UiStates{
         var isSentToSettings = false
+        var taskCompleted = false
     }
 }
+//TODO:REMOVE
 class TriggerListenViewModelFactory(private val trigger: Trigger): ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass.isAssignableFrom(TriggerListenViewModel::class.java)) {

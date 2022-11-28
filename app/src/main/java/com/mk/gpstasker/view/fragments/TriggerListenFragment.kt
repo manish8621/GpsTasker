@@ -1,8 +1,10 @@
 package com.mk.gpstasker.view.fragments
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.Ringtone
 import android.media.RingtoneManager
@@ -20,6 +22,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.gms.location.*
@@ -37,9 +40,11 @@ import com.mk.gpstasker.model.location.LocationClient
 import com.mk.gpstasker.model.network.NetworkUtil
 import com.mk.gpstasker.model.network.checkInternet
 import com.mk.gpstasker.model.room.Trigger
+import com.mk.gpstasker.service.TriggerListenService
 import com.mk.gpstasker.viewmodel.TriggerListenViewModel
 import com.mk.gpstasker.viewmodel.TriggerListenViewModelFactory
 import java.util.*
+import kotlin.math.ln
 
 
 //cleaned
@@ -48,7 +53,6 @@ class TriggerListenFragment : Fragment() {
 
     private val overlaySize: Float
         get() = (viewModel.trigger.location.radius) * 2500F
-
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding:FragmentTriggerListenBinding
@@ -82,7 +86,8 @@ class TriggerListenFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(this){
-            showAlertDialog("Stop the trigger")
+            if(viewModel.uiStates.taskCompleted.not()) showAlertDialog("Stop the trigger")
+            else goBack()
         }
         //permission handle
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){
@@ -109,8 +114,13 @@ class TriggerListenFragment : Fragment() {
         val factory = TriggerListenViewModelFactory(args.trigger)
         viewModel = ViewModelProvider(this,factory)[TriggerListenViewModel::class.java]
 
+        //init net mon
         val connectivityManager=requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         networkUtil = NetworkUtil(connectivityManager)
+
+
+
+
         return binding.root
     }
 
@@ -121,14 +131,26 @@ class TriggerListenFragment : Fragment() {
         //location client
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         locationClient = LocationClient(requireContext(), fusedLocationProviderClient)
-        //
+
+
         setUpObservers()
         setonClickListeners()
 
+        registerLocationReceiver()
+    }
+
+    private fun registerLocationReceiver() {
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver( localBroadcastReceiver, IntentFilter(
+            GPS_BROADCAST_INTENT_FILTER))
+
+    }
+    private fun unRegisterLocationReceiver() {
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(localBroadcastReceiver)
     }
 
     override fun onStart() {
         super.onStart()
+
         //start net monitor
         networkUtil.registerNetworkCallback()
         //TODO : replace with function for ui states
@@ -140,8 +162,10 @@ class TriggerListenFragment : Fragment() {
 
 
     private fun setonClickListeners() {
-        binding.upBtn.setAsNavigationUpBtn()
-        //TODO:do precise click
+        binding.upBtn.setOnClickListener{
+            if(viewModel.uiStates.taskCompleted.not()) showAlertDialog("Stop the trigger")
+            else goBack()
+        }
         binding.noInternetCl.setOnClickListener{
             if(requireContext().checkInternet().not())
                 Toast.makeText(context, "no internet", Toast.LENGTH_SHORT).show()
@@ -149,22 +173,21 @@ class TriggerListenFragment : Fragment() {
     }
 
     private fun setUpObservers() {
-        //observe current location
-        viewModel.currentLocation.observe(viewLifecycleOwner){ loc->
-            loc?.let{
-
-                markCurrentAndTargetLocations(currentLatLng = it.toLatLng())
-                //do trigger action if location reached
-                if (viewModel.isNearDestination()) doAction()
-
-                showDistance()
+        //observe current location to update ui
+        viewModel.currentLocation.observe(viewLifecycleOwner){ location->
+            location?.let{
+                markCurrentAndTargetLocations(currentLatLng = it)
+                if(!viewModel.uiStates.taskCompleted && viewModel.distance.isFinite()) showDistance()
             }
         }
+
         networkUtil.internetAvailable.observe(viewLifecycleOwner){
-            if(it == INTERNET_AVAILABLE)
-                hideNoInternetLayout()
-            else
-                showNoInternetLayout()
+            if(viewModel.uiStates.taskCompleted.not()){
+                if (it == INTERNET_AVAILABLE)
+                    hideNoInternetLayout()
+                else
+                    showNoInternetLayout()
+            }
         }
     }
 
@@ -195,7 +218,7 @@ class TriggerListenFragment : Fragment() {
     }
 
     private fun markTargetLocation(moveCamera: Boolean){
-        dropPinOnMap(viewModel.getTargetLocation().toLatLng(), clearMarkers = true, moveCamera = moveCamera, addGroundOverlay = true, TARGET_LOCATION)
+        dropPinOnMap(args.trigger.location.toLatLng(), clearMarkers = true, moveCamera = moveCamera, addGroundOverlay = true, TARGET_LOCATION)
     }
 
     //mark location on map
@@ -278,18 +301,41 @@ class TriggerListenFragment : Fragment() {
     }
 
 
+
+
     //location update starts here
     private fun getLocationUpdates() {
-        locationClient.getCurrentLocationUpdates(oneShot = false){
-            viewModel.storeCurrentLocation(it)
-        }
+//        locationClient.getCurrentLocationUpdates(oneShot = false){
+//            viewModel.storeCurrentLocation(it)
+//        }
+        startTriggerListenService()
+        startGPSService()
     }
+
+
+    //after location reached do stop all the operations
+    private fun onTaskCompleted() {
+        viewModel.uiStates.taskCompleted = true
+//        stopTriggerListening()
+        stopGPSService()
+        binding.distance.text = getString(R.string.task_completed)
+    }
+    //stops all operations
+    private fun stopTriggerListening() {
+//        locationClient.stopLocationUpdates()
+        stopTriggerListenService()
+        Toast.makeText(context, "Trigger stopped", Toast.LENGTH_SHORT).show()
+    }
+
+
+
+
 
     //shows distance b/w current location and the target location
     private fun showDistance() {
         //print distance on screen
         viewModel.currentLocation.value?.let {
-            ("distance : " + viewModel.distance.toFloat().format(3)).also { dist->
+            ("distance : " + viewModel.distance.format(3)+" km").also { dist->
                 binding.distance.text = dist
             }
         }
@@ -313,43 +359,9 @@ class TriggerListenFragment : Fragment() {
     }
 
 
-    //trigger action will be done here
-    private fun doAction() {
-        when(viewModel.getAction()){
-            Trigger.ACTION_ALERT -> alert()
-            Trigger.ACTION_SILENCE -> silentMode()
-            else -> Toast.makeText(context, "triggered but no action", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    //one shot
-    //puts mobile to silent mode
-    private fun silentMode() {
-        val audioManager = requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager.ringerMode = AudioManager.RINGER_MODE_VIBRATE
-        Toast.makeText(context, "GPS TASKER : putting device into to Silent mode", Toast.LENGTH_SHORT).show()
-        goBack()
-    }
-
-    //TODO
-    private fun alert() {
-        val ringtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context,RingtoneManager.TYPE_NOTIFICATION)
-        ringtone = RingtoneManager.getRingtone(context,ringtoneUri)
-        ringtone.play()
-    }
-
-    fun stopAlert(){
-        if(::ringtone.isInitialized && ringtone.isPlaying)
-            ringtone.stop()
-    }
 
 
-    //stops all operations
-    private fun stopTriggerListening() {
-        stopAlert()
-        locationClient.stopLocationUpdates()
-        Toast.makeText(context, "Trigger stopped", Toast.LENGTH_SHORT).show()
-    }
+
 
     //to enable location permissions user will be sent to settings
     private fun goToAppInfo() {
@@ -370,18 +382,70 @@ class TriggerListenFragment : Fragment() {
     }
     //navigate up
     private fun goBack() {
+        //TODO:REMOVE
+//        stopTriggerListening()
         findNavController().navigateUp()
     }
+
+
+
+
+
+    private fun startTriggerListenService(){
+        val intent = Intent(requireContext(),TriggerListenService::class.java)
+        intent.putExtra(SERVICE_COMMAND,TriggerListenService.START_SERVICE)
+        intent.putExtra(TRIGGER_SERIALIZABLE,args.trigger)
+        requireContext().startService(intent)
+    }
+    private fun startGPSService(){
+        val intent = Intent(requireContext(),TriggerListenService::class.java)
+        intent.putExtra(SERVICE_COMMAND,TriggerListenService.START_GPS)
+        requireContext().startService(intent)
+    }
+    fun stopGPSService(){
+        val intent = Intent(requireContext(),TriggerListenService::class.java)
+        intent.putExtra(SERVICE_COMMAND, TriggerListenService.STOP_GPS)
+        requireContext().startService(intent)
+    }
+    private fun stopTriggerListenService(){
+        val intent = Intent(requireContext(),TriggerListenService::class.java)
+        intent.putExtra(SERVICE_COMMAND, TriggerListenService.STOP_SERVICE)
+        requireContext().startService(intent)
+    }
+
+    private val localBroadcastReceiver = object:BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent?.let{
+                val command = intent.getIntExtra("command",-1)
+                if(command == TriggerListenService.LOCATION_SENT)
+                {
+                    val lat = intent.getStringExtra(LATITUDE)?:return
+                    val lng = intent.getStringExtra(LONGITUDE)?:return
+                    val distance = intent.getFloatExtra(DISTANCE,0.0f)
+
+                    if (::viewModel.isInitialized){
+                        viewModel.distance = distance
+                        viewModel.storeCurrentLocation(LatLng(lat.toDouble(), lng.toDouble()))
+                    }
+                }
+                else if(command == TriggerListenService.TRIGGER_SUCCESS)
+                {
+                    onTaskCompleted()
+                }
+            }
+        }
+    }
+
 
     override fun onStop() {
         super.onStop()
         networkUtil.unregisterNetworkCallback()
     }
+
     //stop if any location updates
     override fun onDestroy() {
         super.onDestroy()
+        unRegisterLocationReceiver()
         stopTriggerListening()
     }
-
-
 }

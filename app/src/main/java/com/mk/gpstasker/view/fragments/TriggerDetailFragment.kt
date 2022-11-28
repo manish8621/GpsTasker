@@ -48,6 +48,9 @@ class TriggerDetailFragment : Fragment() {
     }
 
     private fun setClickListeners() {
+        binding.upBtn.setOnClickListener{
+            findNavController().navigateUp()
+        }
         binding.alertIv.setOnClickListener{
             viewModel.triggerAction.value = Trigger.ACTION_ALERT
             selectOption(it as ImageView , binding.alertTv)
@@ -70,11 +73,8 @@ class TriggerDetailFragment : Fragment() {
     }
 
     private fun goToTriggersListScreen() {
-        findNavController().navigateUp()
+        findNavController().popBackStack(R.id.triggersFragment,false)
     }
-
-
-
 
     private fun unSelectOption(imageView: ImageView, textView: TextView) {
         imageView.tag =""

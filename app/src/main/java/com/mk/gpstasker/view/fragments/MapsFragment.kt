@@ -123,9 +123,9 @@ class MapsFragment : Fragment() {
 
         setClickListeners()
         setObservers()
+        binding.rangeSlider.setValues(0.4f)
         binding.rangeSlider.setMinSeparationValue(0.01F)
     }
-
     //check user sent to settings and start the process after user returns
     override fun onStart() {
         super.onStart()
@@ -169,7 +169,7 @@ class MapsFragment : Fragment() {
 
     private fun changeRadiusInUi(rad:Float) {
         //text view update
-        "${rad.format(2)} km".also { binding.radiusValueTv.text = it }
+        "${rad.format(4)} km".also { binding.radiusValueTv.text = it }
         //to change ground overlay size
         viewModel.latLng.value?.let {
             if (::mMap.isInitialized)
@@ -252,7 +252,6 @@ class MapsFragment : Fragment() {
             //TODO:Into a function
             viewModel.radius.value = value * MaxRadius
         })
-        binding.upBtn.setAsNavigationUpBtn()
     }
 
     //ui utils to select and unselect options

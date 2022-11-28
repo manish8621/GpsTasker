@@ -3,9 +3,11 @@ package com.mk.gpstasker.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -14,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.core.location.LocationManagerCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +29,7 @@ import com.google.android.gms.location.Priority
 import com.mk.gpstasker.MainActivity
 import com.mk.gpstasker.R
 import com.mk.gpstasker.databinding.FragmentHomeBinding
+import com.mk.gpstasker.service.TriggerListenService
 import com.mk.gpstasker.viewmodel.HomeViewModel
 
 
@@ -34,6 +38,7 @@ val GPS_UPDATE_INTERVEL= 500L
 
 class HomeFragment : Fragment() {
 
+    lateinit var intent: Intent
     lateinit var binding: FragmentHomeBinding
     lateinit var viewModel : HomeViewModel
     lateinit var locationCallBack:LocationCallback
@@ -70,7 +75,11 @@ class HomeFragment : Fragment() {
 
         setUpObservers()
         setonClickListeners()
-        fetchLocation()
+//        fetchLocation()
+
+
+
+
 
         return binding.root
     }
@@ -88,6 +97,12 @@ class HomeFragment : Fragment() {
                 viewModel.lon = it.longitude
             }
             Toast.makeText(context, "current co ord -> target", Toast.LENGTH_SHORT).show()
+        }
+        binding.serviceBtn.setOnClickListener{
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                intent = Intent(requireContext(),TriggerListenService::class.java)
+                requireContext().startForegroundService(intent)
+            }
         }
     }
 
@@ -163,6 +178,8 @@ class HomeFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         stopLocationRequest()
+        if (::intent.isInitialized)
+            requireContext().stopService(intent)
     }
 
 }

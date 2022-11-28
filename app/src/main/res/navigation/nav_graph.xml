@@ -30,8 +30,7 @@
         tools:layout="@layout/fragment_maps" >
         <action
             android:id="@+id/action_mapsFragment_to_triggerDetailFragment"
-            app:destination="@id/triggerDetailFragment"
-            app:popUpTo="@id/triggersFragment" />
+            app:destination="@id/triggerDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/triggerDetailFragment"

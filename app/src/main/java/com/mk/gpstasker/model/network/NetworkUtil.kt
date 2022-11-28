@@ -63,6 +63,7 @@ class NetworkUtil(private val connectivityManager: ConnectivityManager) {
         val networkRequest = NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
         connectivityManager.registerNetworkCallback(networkRequest,netCallback)
     }
+
     fun unregisterNetworkCallback(){
         connectivityManager.unregisterNetworkCallback(netCallback)
     }
