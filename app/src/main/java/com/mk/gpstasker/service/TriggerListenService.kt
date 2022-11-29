@@ -1,6 +1,7 @@
 package com.mk.gpstasker.service
 
 import android.app.Application
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -10,40 +11,70 @@ import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.IBinder
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.mk.gpstasker.App
+import com.mk.gpstasker.MainActivity
+import com.mk.gpstasker.R
 import com.mk.gpstasker.model.*
 import com.mk.gpstasker.model.location.LocationClient
 import com.mk.gpstasker.model.repository.TriggersRepository
 import com.mk.gpstasker.model.room.Trigger
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlin.system.exitProcess
 
 class TriggerListenService: Service() {
+    //command is used to track the current status of service
     var command = START_SERVICE
 
+    //to be alive at background
+    lateinit var activityPendingIntent: PendingIntent
+    lateinit var exitPendingIntent:PendingIntent
+    lateinit var notificationBuilder:NotificationCompat.Builder
 
+
+    //
     lateinit var locationClient: LocationClient
     lateinit var trigger: Trigger
+    //TODO:try to remove this
     lateinit var ringtone: Ringtone
     lateinit var repository: TriggersRepository
+    //TODO:see will it cause bug
     private var distance  = Double.MAX_VALUE
-
 
 
     override fun onCreate() {
         super.onCreate()
         //init all
         initLocationClient()
+        initNotification()
+        startInForeground()
         repository = (application as App).triggersRepository
         serviceRunning = true
     }
 
+    private fun initNotification() {
+        //init pending intents for notification
+        Intent(this,MainActivity::class.java).also {
+            activityPendingIntent = PendingIntent.getActivity(this,PENDING_INTENT_REQ_CODE_ACT,it,PendingIntent.FLAG_IMMUTABLE)
+        }
+        Intent(this,TriggerListenService::class.java).also {
+            it.putExtra(SERVICE_COMMAND, EXIT_PROCESS)
+            exitPendingIntent = PendingIntent.getService(this, PENDING_INTENT_REQ_CODE_SER,it,PendingIntent.FLAG_IMMUTABLE)
+        }
+
+        notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHN_ID)
+            .setSmallIcon(R.drawable.gps_ico)
+            .setContentTitle("gps tasker listening")
+            .setContentText("Tap to return to app")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(activityPendingIntent)
+    }
+
+    //for every action service will get an intent based on that service will act
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         intent?.let{
@@ -58,7 +89,6 @@ class TriggerListenService: Service() {
 
             }
 
-
             //check if command is duplicated
             if(newCommand != command)
             {
@@ -66,6 +96,7 @@ class TriggerListenService: Service() {
                     START_GPS -> startGPS()
                     STOP_GPS -> stopGPS()
                     STOP_SERVICE -> stopAll()
+                    EXIT_PROCESS -> stopAll()
                 }
                 command = newCommand
             }
@@ -76,7 +107,7 @@ class TriggerListenService: Service() {
     }
 
     private fun startInForeground() {
-        TODO("Not yet implemented")
+        startForeground(NOTIFICATION_ID,notificationBuilder.build())
     }
 
     //init functions
@@ -93,7 +124,7 @@ class TriggerListenService: Service() {
                 sendLocation(it)
                 if (isNearDestination(LatLng(it.latitude,it.longitude))) onTriggerSuccess()
             }
-//            startInForeground()
+
         }
     }
 
@@ -106,9 +137,9 @@ class TriggerListenService: Service() {
     }
 
     //updates trigger status as not running
-    private fun updateTriggersAsNotRunning(triggerId:Long){
+    private fun updateTriggersAsNotRunning(){
         CoroutineScope(Dispatchers.IO).launch(Dispatchers.IO) {
-                repository.updateTriggerState(triggerId,onGoing = false)
+                repository.updateTriggerState(trigger.id,onGoing = false)
         }
     }
 
@@ -117,10 +148,13 @@ class TriggerListenService: Service() {
         serviceRunning = false
         stopGPS()
         stopAlert()
-        //TODO:dsf
-
-//      stopForeground(true)
+        stopForeground(true)
         stopSelf()
+    }
+    private fun quitApp(){
+        updateTriggersAsNotRunning()
+        stopAll()
+        exitProcess(0)
     }
 
     //broadcasts the trigger task is done
@@ -132,15 +166,26 @@ class TriggerListenService: Service() {
 
     //this function  will handle the triggered situation first
     private fun onTriggerSuccess() {
-        updateTriggersAsNotRunning(trigger.id)
+        updateTriggersAsNotRunning()
         //for safe
         if(command == START_GPS){
             stopGPS()
             doAction()
             sendTriggerSuccess()
-            //TODO:notification change
+            showTriggerSuccessNotification()
         }
     }
+
+    private fun showTriggerSuccessNotification() {
+        notificationBuilder.setContentTitle("gps tasker - task completed")
+            .setContentText("Tap to exit")
+            .setContentIntent(exitPendingIntent)
+            .clearActions()
+            .setAutoCancel(true)
+
+        startForeground(NOTIFICATION_ID,notificationBuilder.build())
+    }
+
 
     //broadcasts the location
     private fun sendLocation(location:Location){
@@ -167,7 +212,6 @@ class TriggerListenService: Service() {
         }
         return false
     }
-
 
     //trigger action will be done here
     private fun doAction() {
@@ -210,12 +254,13 @@ class TriggerListenService: Service() {
 
 
         //command
-        const val LOCATION_SENT = 4
-        const val START_SERVICE = 0
+        const val LOCATION_SENT = 1
+        const val START_SERVICE = 2
         const val STOP_SERVICE = 3
-        const val START_GPS = 1
-        const val STOP_GPS = 2
-        const val TRIGGER_SUCCESS = 5
+        const val EXIT_PROCESS = 4
+        const val START_GPS = 5
+        const val STOP_GPS = 6
+        const val TRIGGER_SUCCESS = 7
     }
 
     override fun onDestroy() {
@@ -223,6 +268,7 @@ class TriggerListenService: Service() {
         stopAlert()
         stopGPS()
     }
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }

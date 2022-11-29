@@ -112,7 +112,7 @@ class TriggersFragment : Fragment() {
     private fun startTriggerListener(trigger: Trigger) {
         if(requireContext().checkInternet()== INTERNET_AVAILABLE) {
             if(locationClient.checkLocationPermission()) {
-                if(locationClient.checkLocationEnabled()){ gotoTriggerListenFragment(trigger) }
+                if(locationClient.checkLocationEnabled()){ gotoTriggerListenFragment(trigger,isAlreadyRunning = false) }
                 else {
                     Snackbar.make(
                         binding.root,
@@ -135,7 +135,9 @@ class TriggersFragment : Fragment() {
         else Toast.makeText(context, "No Internet", Toast.LENGTH_SHORT).show()
     }
 
-    private fun gotoTriggerListenFragment(trigger: Trigger) {
+    private fun gotoTriggerListenFragment(trigger: Trigger,isAlreadyRunning:Boolean) {
+        if(isAlreadyRunning.not()) viewModel.updateTriggersAsRunning(trigger.id)
+        viewModel.uiStates.isSentToTriggerListenFragment = true
         findNavController().navigate(TriggersFragmentDirections.actionTriggersFragmentToTriggerListenFragment(trigger))
     }
 
@@ -152,10 +154,20 @@ class TriggersFragment : Fragment() {
 
     }
 
+    //the trigger list will be ordered by onGoing (field) in db and sent here
+    //so just checking if the first item is if onGoing we could easily say there is a trigger already running
+    //so navigate to the listening fragment
+    //there can only one ongoing triggerListener
     private fun setObservers(adapter: TriggerAdapter) {
         viewModel.triggerList.observe(viewLifecycleOwner){
             it?.let{
-                if(it.isEmpty()) showStatus("No triggers added\nTry adding new triggers") else hideStatus()
+                if(it.isEmpty()) showStatus("No triggers added\nTry adding new triggers")
+                else {
+                    //checks if trigger is already in background
+                    if(viewModel.uiStates.isSentToTriggerListenFragment.not() && it.first().onGoing)
+                        gotoTriggerListenFragment(trigger = it.first(), isAlreadyRunning = true)
+                    hideStatus()
+                }
                 adapter.submitList(it)
             }
         }

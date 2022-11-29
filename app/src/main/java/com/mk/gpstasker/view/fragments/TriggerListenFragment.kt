@@ -456,6 +456,5 @@ class TriggerListenFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         unRegisterLocationReceiver()
-        stopTriggerListening()
     }
 }

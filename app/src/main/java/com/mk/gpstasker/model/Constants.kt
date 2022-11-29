@@ -11,7 +11,12 @@ const val INTERNET_UNAVAILABLE= false
 
 
 const val GPS_BROADCAST_INTENT_FILTER= "GPSLocationUpdates"
-const val TRIGGER_BUNDLE= "triggerBundle"
+const val PENDING_INTENT_REQ_CODE_ACT= 102
+const val PENDING_INTENT_REQ_CODE_SER= 103
+const val NOTIFICATION_CHN_NAME= "gps tasker chn"
+const val NOTIFICATION_CHN_ID= "GPTSK123"
+const val NOTIFICATION_ID= 104
+
 const val TRIGGER_SERIALIZABLE= "trigger_serializable"
 
 
