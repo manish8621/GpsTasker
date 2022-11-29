@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.DiscretePathEffect
 import android.media.AudioManager
 import android.media.Ringtone
 import android.media.RingtoneManager
@@ -22,6 +23,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -32,6 +34,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.snackbar.Snackbar
+import com.mk.gpstasker.App
 import com.mk.gpstasker.BuildConfig
 import com.mk.gpstasker.R
 import com.mk.gpstasker.databinding.FragmentTriggerListenBinding
@@ -43,6 +46,10 @@ import com.mk.gpstasker.model.room.Trigger
 import com.mk.gpstasker.service.TriggerListenService
 import com.mk.gpstasker.viewmodel.TriggerListenViewModel
 import com.mk.gpstasker.viewmodel.TriggerListenViewModelFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.math.ln
 
@@ -111,7 +118,9 @@ class TriggerListenFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTriggerListenBinding.inflate(inflater,container,false)
-        val factory = TriggerListenViewModelFactory(args.trigger)
+
+        val repository = (requireActivity().application as App).triggersRepository
+        val factory = TriggerListenViewModelFactory(args.trigger,repository)
         viewModel = ViewModelProvider(this,factory)[TriggerListenViewModel::class.java]
 
         //init net mon
@@ -324,7 +333,6 @@ class TriggerListenFragment : Fragment() {
     private fun stopTriggerListening() {
 //        locationClient.stopLocationUpdates()
         stopTriggerListenService()
-        Toast.makeText(context, "Trigger stopped", Toast.LENGTH_SHORT).show()
     }
 
 
@@ -351,7 +359,7 @@ class TriggerListenFragment : Fragment() {
             .setPositiveButton("Yes"
             ) { _, _ ->
                 stopTriggerListening()
-                findNavController().navigateUp()
+                goBack()
             }
             .setNegativeButton("no") { dialog, _ ->
                 dialog.cancel()
@@ -383,7 +391,9 @@ class TriggerListenFragment : Fragment() {
     //navigate up
     private fun goBack() {
         //TODO:REMOVE
-//        stopTriggerListening()
+        if(viewModel.uiStates.taskCompleted.not()) viewModel.updateTriggersAsNotRunning()
+        stopTriggerListenService()
+        Toast.makeText(context, "Trigger stopped", Toast.LENGTH_SHORT).show()
         findNavController().navigateUp()
     }
 

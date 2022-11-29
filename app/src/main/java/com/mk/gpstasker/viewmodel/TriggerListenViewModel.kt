@@ -1,18 +1,17 @@
 package com.mk.gpstasker.viewmodel
 
-import android.location.Location
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.model.LatLng
+import com.mk.gpstasker.model.repository.TriggersRepository
 import com.mk.gpstasker.model.room.Trigger
-import kotlin.math.asin
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class TriggerListenViewModel(val trigger: Trigger):ViewModel() {
+class TriggerListenViewModel(val trigger: Trigger, val repository: TriggersRepository):ViewModel() {
 
     private val _currentLocation = MutableLiveData<LatLng>()
     val currentLocation : LiveData<LatLng>
@@ -40,16 +39,24 @@ class TriggerListenViewModel(val trigger: Trigger):ViewModel() {
     {
         _currentLocation.value = location
     }
+
+    //updates trigger status as not running
+    fun updateTriggersAsNotRunning(){
+        CoroutineScope(Dispatchers.IO).launch(Dispatchers.IO) {
+            repository.updateTriggerState(trigger.id,onGoing = false)
+        }
+    }
+
     class UiStates{
         var isSentToSettings = false
         var taskCompleted = false
     }
 }
 //TODO:REMOVE
-class TriggerListenViewModelFactory(private val trigger: Trigger): ViewModelProvider.Factory{
+class TriggerListenViewModelFactory(private val trigger: Trigger,private val repository: TriggersRepository): ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass.isAssignableFrom(TriggerListenViewModel::class.java)) {
-            return TriggerListenViewModel(trigger) as T
+            return TriggerListenViewModel(trigger,repository) as T
         }
         throw IllegalArgumentException("illegal arg in listen factory")
     }

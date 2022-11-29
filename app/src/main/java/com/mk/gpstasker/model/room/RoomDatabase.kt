@@ -5,10 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Trigger::class], version = 2)
+@Database(entities = [Trigger::class], version = 3)
 abstract class TriggerDatabase: RoomDatabase() {
     abstract val triggersDao:TriggersDao
     companion object{
+        @Volatile
         private var INSTANCE:TriggerDatabase? = null
         fun getDatabase(context:Context):TriggerDatabase{
             return synchronized(this){

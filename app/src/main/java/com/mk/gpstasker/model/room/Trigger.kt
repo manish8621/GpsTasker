@@ -16,7 +16,9 @@ data class Trigger(
 
     val triggerAction:String,
 
-    val label:String
+    val label:String,
+
+    var onGoing:Boolean = false
 
     ):java.io.Serializable
 {

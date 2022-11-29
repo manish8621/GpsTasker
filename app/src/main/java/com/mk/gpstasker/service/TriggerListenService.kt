@@ -1,5 +1,6 @@
 package com.mk.gpstasker.service
 
+import android.app.Application
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -9,12 +10,19 @@ import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.IBinder
 import android.widget.Toast
+import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import com.mk.gpstasker.App
 import com.mk.gpstasker.model.*
 import com.mk.gpstasker.model.location.LocationClient
+import com.mk.gpstasker.model.repository.TriggersRepository
 import com.mk.gpstasker.model.room.Trigger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TriggerListenService: Service() {
     var command = START_SERVICE
@@ -23,13 +31,16 @@ class TriggerListenService: Service() {
     lateinit var locationClient: LocationClient
     lateinit var trigger: Trigger
     lateinit var ringtone: Ringtone
+    lateinit var repository: TriggersRepository
     private var distance  = Double.MAX_VALUE
+
+
 
     override fun onCreate() {
         super.onCreate()
         //init all
         initLocationClient()
-
+        repository = (application as App).triggersRepository
         serviceRunning = true
     }
 
@@ -40,10 +51,11 @@ class TriggerListenService: Service() {
             val newCommand = it.getIntExtra(SERVICE_COMMAND, START_SERVICE)
 
             //init trigger
-            if (newCommand == START_SERVICE) {
+            if (command == START_SERVICE && newCommand == START_SERVICE) {
                 it.getSerializableExtra(TRIGGER_SERIALIZABLE)?.let { trigger->
                     this.trigger = trigger as Trigger
                 }
+
             }
 
 
@@ -63,6 +75,10 @@ class TriggerListenService: Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    private fun startInForeground() {
+        TODO("Not yet implemented")
+    }
+
     //init functions
     private fun initLocationClient() {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -77,13 +93,23 @@ class TriggerListenService: Service() {
                 sendLocation(it)
                 if (isNearDestination(LatLng(it.latitude,it.longitude))) onTriggerSuccess()
             }
+//            startInForeground()
         }
     }
 
 
     //stops getting current location
     private fun stopGPS() {
-        if(command == START_GPS) locationClient.stopLocationUpdates()
+        if(command == START_GPS) {
+            locationClient.stopLocationUpdates()
+        }
+    }
+
+    //updates trigger status as not running
+    private fun updateTriggersAsNotRunning(triggerId:Long){
+        CoroutineScope(Dispatchers.IO).launch(Dispatchers.IO) {
+                repository.updateTriggerState(triggerId,onGoing = false)
+        }
     }
 
     //stops all ongoing ops
@@ -92,11 +118,13 @@ class TriggerListenService: Service() {
         stopGPS()
         stopAlert()
         //TODO:dsf
+
+//      stopForeground(true)
         stopSelf()
     }
 
     //broadcasts the trigger task is done
-    fun sendTriggerSuccess(){
+    private fun sendTriggerSuccess(){
         val intent = Intent("GPSLocationUpdates")
         intent.putExtra("command", TRIGGER_SUCCESS)
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
@@ -104,6 +132,7 @@ class TriggerListenService: Service() {
 
     //this function  will handle the triggered situation first
     private fun onTriggerSuccess() {
+        updateTriggersAsNotRunning(trigger.id)
         //for safe
         if(command == START_GPS){
             stopGPS()

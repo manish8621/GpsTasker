@@ -16,4 +16,8 @@ class TriggersRepository(private val database: TriggerDatabase) {
     suspend fun deleteTrigger(trigger: Trigger){
         database.triggersDao.deleteTrigger(trigger)
     }
+    fun updateTriggerState(triggerId:Long,onGoing:Boolean){
+
+        database.triggersDao.updateTriggerState(triggerId,onGoing)
+    }
 }

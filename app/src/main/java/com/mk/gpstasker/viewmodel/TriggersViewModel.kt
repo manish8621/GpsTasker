@@ -14,18 +14,20 @@ class TriggersViewModel(val repository: TriggersRepository) : ViewModel() {
 
     val uiStates=UiStates()
     val triggerList = repository.getTriggers()
-//    fun addTrigger(lat:Double,lng:Double){
-//        //add to db via repo
-//        viewModelScope.launch {
-//            withContext(Dispatchers.IO)
-//            {
-//                repository.saveTrigger(Trigger(location = Location(latitude =lat, longitude = lng, "unlabeled")
-//                    , triggerAction = Trigger.ACTION_SILENCE
-//                ))
-//            }
-//        }
-//    }
+
+    //this is used to (save the trigger that user clicked) start listening after
+    // user gone to settings ,given permissions and returned
     var lastSelectedTrigger:Trigger? = null
+    //updates the trigger's onGoing column as true
+    fun updateTriggersAsRunning(triggerId:Long){
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.IO)
+            {
+                repository.updateTriggerState(triggerId,onGoing = true)
+            }
+        }
+    }
+
     fun deleteTrigger(trigger: Trigger){
        viewModelScope.launch {
            withContext(Dispatchers.IO){
@@ -33,7 +35,9 @@ class TriggersViewModel(val repository: TriggersRepository) : ViewModel() {
            }
        }
     }
+
     class UiStates{
         var  isSentToSettings = false
+        var  isSentToTriggerListenFragment = false
     }
 }

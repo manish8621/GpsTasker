@@ -8,7 +8,7 @@ interface TriggersDao {
     @Insert
     fun insertTrigger(trigger: Trigger)
 
-    @Query("SELECT * FROM trigger_table")
+    @Query("SELECT * FROM trigger_table order by onGoing desc")
     fun getTriggers():LiveData<List<Trigger>>
 
     @Query("SELECT * FROM trigger_table where id = :id")
@@ -19,4 +19,8 @@ interface TriggersDao {
 
     @Update
     fun updateTrigger(trigger: Trigger)
+
+    @Query("UPDATE trigger_table set onGoing = :onGoing where id = :id")
+    fun updateTriggerState(id: Long,onGoing:Boolean)
+
 }

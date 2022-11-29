@@ -85,7 +85,7 @@ class TriggerDetailFragment : Fragment() {
     private fun selectOption(imageView: ImageView, textView: TextView) {
         imageView.tag ="selected"
         imageView.background = AppCompatResources.getDrawable(requireContext(),R.drawable.highlight_bg_a)
-        textView.setTextColor(requireContext().getColor(R.color.highlight_color))
+        textView.setTextColor(requireContext().getColor(R.color.primary_sat_highlight))
     }
 
 
