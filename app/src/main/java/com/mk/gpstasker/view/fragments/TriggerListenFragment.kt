@@ -239,11 +239,7 @@ class TriggerListenFragment : Fragment() {
             latLng.latitude,
             latLng.longitude
         )
-        //TODO:replace current locatoin
-        val icon = BitmapDescriptorFactory.fromResource(
-            if(locationType == TARGET_LOCATION) R.drawable.flag_64
-            else R.drawable.gps_ico
-        )
+
         val markerTitle = if(locationType== CURRENT_LOCATION) "currnt location" else "Target"
 
 
@@ -255,7 +251,7 @@ class TriggerListenFragment : Fragment() {
                 .position(latLng)
                 .title(markerTitle)
                 .snippet(snippet)
-                .icon(icon)
+                .also { if(locationType == CURRENT_LOCATION) it.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location_blue)) }
         )
 
         if(moveCamera)
@@ -314,10 +310,8 @@ class TriggerListenFragment : Fragment() {
 
     //location update starts here
     private fun getLocationUpdates() {
-//        locationClient.getCurrentLocationUpdates(oneShot = false){
-//            viewModel.storeCurrentLocation(it)
-//        }
-        startTriggerListenService()
+        if(TriggerListenService.isRunning.not())
+            startTriggerListenService()
         startGPSService()
     }
 
@@ -325,13 +319,11 @@ class TriggerListenFragment : Fragment() {
     //after location reached do stop all the operations
     private fun onTaskCompleted() {
         viewModel.uiStates.taskCompleted = true
-//        stopTriggerListening()
         stopGPSService()
         binding.distance.text = getString(R.string.task_completed)
     }
     //stops all operations
     private fun stopTriggerListening() {
-//        locationClient.stopLocationUpdates()
         stopTriggerListenService()
     }
 
@@ -393,6 +385,7 @@ class TriggerListenFragment : Fragment() {
         //TODO:REMOVE
         if(viewModel.uiStates.taskCompleted.not()) viewModel.updateTriggersAsNotRunning()
         stopTriggerListenService()
+        unRegisterLocationReceiver()
         Toast.makeText(context, "Trigger stopped", Toast.LENGTH_SHORT).show()
         findNavController().navigateUp()
     }

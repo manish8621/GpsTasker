@@ -79,11 +79,13 @@ class TriggerDetailFragment : Fragment() {
     private fun unSelectOption(imageView: ImageView, textView: TextView) {
         imageView.tag =""
         imageView.background = null
+        imageView.setColorFilter(requireContext().getColor(R.color.black))
         textView.setTextColor(requireContext().getColor(R.color.black))
     }
 
     private fun selectOption(imageView: ImageView, textView: TextView) {
         imageView.tag ="selected"
+        imageView.setColorFilter(requireContext().getColor(R.color.primary_sat_highlight))
         imageView.background = AppCompatResources.getDrawable(requireContext(),R.drawable.highlight_bg_a)
         textView.setTextColor(requireContext().getColor(R.color.primary_sat_highlight))
     }

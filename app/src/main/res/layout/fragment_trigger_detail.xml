@@ -15,7 +15,7 @@
         android:background="@color/primary"
         tools:context=".view.fragments.TriggerDetailFragment">
 
-
+<!--TODO:Replace with other layout-->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_tb"
             android:layout_width="match_parent"
@@ -113,9 +113,10 @@
             android:layout_marginTop="16dp"
             android:contentDescription="@string/alert"
             android:padding="10dp"
-            android:src="@drawable/ic_baseline_phonelink_ring_24"
+            android:src="@drawable/alert"
             app:layout_constraintEnd_toStartOf="@+id/endGuide"
-            app:layout_constraintTop_toBottomOf="@+id/select_trigger_action_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/select_trigger_action_tv"
+            app:tint="@color/black" />
 
         <TextView
             android:id="@+id/alert_tv"
@@ -123,7 +124,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Alert"
+            android:text="@string/alert"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@+id/alert_iv"
             app:layout_constraintStart_toStartOf="@+id/alert_iv"
@@ -139,6 +140,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/trigger_label"
             android:lines="1"
+            android:inputType="text"
             android:text="@={viewModel.triggerLabel}"
             android:textColorHighlight="@color/on_primary"
             android:layout_marginTop="8dp"
