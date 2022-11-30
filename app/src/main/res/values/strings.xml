@@ -22,4 +22,6 @@
     <string name="gps_tasker_listen_to_trigger"><![CDATA[GPS Tasker > Listen to trigger]]></string>
     <string name="gps_tasker_select_location"><![CDATA[GPS Tasker > select location]]></string>
     <string name="task_completed">Task Completed</string>
+    <string name="location_reached">Location reached</string>
+    <string name="stop">stop</string>
 </resources>

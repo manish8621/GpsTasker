@@ -58,6 +58,8 @@ class TriggersFragment : Fragment() {
             }
         }
         }
+
+
     }
 
     override fun onCreateView(

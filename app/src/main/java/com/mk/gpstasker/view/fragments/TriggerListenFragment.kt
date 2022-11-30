@@ -144,7 +144,6 @@ class TriggerListenFragment : Fragment() {
 
         setUpObservers()
         setonClickListeners()
-
         registerLocationReceiver()
     }
 
@@ -255,7 +254,7 @@ class TriggerListenFragment : Fragment() {
         )
 
         if(moveCamera)
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
         //show location trigger radius
         if(addGroundOverlay) {
             val groundOverlay =
@@ -276,9 +275,7 @@ class TriggerListenFragment : Fragment() {
     //user will asked to grant or turn on location related things
     //if they no snack bar will be shown they can use that to go settings
     private fun locationUsable(): Boolean {
-        //TODO: network check
-        if(true)
-        {
+
             if (locationClient.checkLocationPermission()) {
                 if (locationClient.checkLocationEnabled()) {
                     return true
@@ -298,10 +295,7 @@ class TriggerListenFragment : Fragment() {
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
-        }
-        else{
-            Toast.makeText(context, "no internet", Toast.LENGTH_SHORT).show()
-        }
+
         return false
     }
 
@@ -396,23 +390,23 @@ class TriggerListenFragment : Fragment() {
 
     private fun startTriggerListenService(){
         val intent = Intent(requireContext(),TriggerListenService::class.java)
-        intent.putExtra(SERVICE_COMMAND,TriggerListenService.START_SERVICE)
+        intent.action = TriggerListenService.START_SERVICE
         intent.putExtra(TRIGGER_SERIALIZABLE,args.trigger)
         requireContext().startService(intent)
     }
     private fun startGPSService(){
         val intent = Intent(requireContext(),TriggerListenService::class.java)
-        intent.putExtra(SERVICE_COMMAND,TriggerListenService.START_GPS)
+        intent.action = TriggerListenService.START_GPS
         requireContext().startService(intent)
     }
-    fun stopGPSService(){
+    private fun stopGPSService(){
         val intent = Intent(requireContext(),TriggerListenService::class.java)
-        intent.putExtra(SERVICE_COMMAND, TriggerListenService.STOP_GPS)
+        intent.action = TriggerListenService.STOP_GPS
         requireContext().startService(intent)
     }
     private fun stopTriggerListenService(){
         val intent = Intent(requireContext(),TriggerListenService::class.java)
-        intent.putExtra(SERVICE_COMMAND, TriggerListenService.STOP_SERVICE)
+        intent.action = TriggerListenService.STOP_SERVICE
         requireContext().startService(intent)
     }
 
