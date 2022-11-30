@@ -95,8 +95,8 @@ class TriggerListenService: Service() {
                 when(newCommand){
                     START_GPS -> startGPS()
                     STOP_GPS -> stopGPS()
-                    STOP_SERVICE -> stopAll()
-                    EXIT_PROCESS -> stopAll()
+                    STOP_SERVICE -> stopServ()
+                    EXIT_PROCESS -> quitApp()
                 }
                 command = newCommand
             }
@@ -143,20 +143,17 @@ class TriggerListenService: Service() {
         }
     }
 
-    //stops all ongoing ops
-    private fun stopAll() {
+    private fun quitApp(){
+        stopServ()
+        exitProcess(0)
+    }
+    private fun stopServ(){
         serviceRunning = false
         stopGPS()
         stopAlert()
         stopForeground(true)
         stopSelf()
     }
-    private fun quitApp(){
-        updateTriggersAsNotRunning()
-        stopAll()
-        exitProcess(0)
-    }
-
     //broadcasts the trigger task is done
     private fun sendTriggerSuccess(){
         val intent = Intent("GPSLocationUpdates")
@@ -265,8 +262,6 @@ class TriggerListenService: Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopAlert()
-        stopGPS()
     }
 
     override fun onBind(intent: Intent?): IBinder? {
