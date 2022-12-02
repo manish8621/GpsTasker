@@ -10,6 +10,7 @@ import android.media.AudioManager
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.IBinder
+import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.viewModelScope
@@ -79,7 +80,6 @@ class TriggerListenService: Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         intent?.let{
-            //TODO:can the default value assign in any scenario ,i mean will service start without bundle
             val newCommand = it.action?: START_SERVICE
 
             //init trigger
@@ -175,10 +175,14 @@ class TriggerListenService: Service() {
         //for safe
         if(command == START_GPS){
             stopGPS()
-            Intent(this,ActionActivity::class.java).also {
-                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(it)
-            }
+            //if trigger action is not silence mode then show a screen to user
+            if(trigger.triggerAction != Trigger.ACTION_SILENCE)
+                Intent(this,ActionActivity::class.java).also {
+                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    it.putExtra(Trigger.ACTION_TYPE,trigger.triggerAction)
+                    startActivity(it)
+                }
+
             doAction()
             sendTriggerSuccess()
             showTriggerSuccessNotification()
@@ -235,8 +239,16 @@ class TriggerListenService: Service() {
         when(trigger.triggerAction){
             Trigger.ACTION_ALERT -> alert()
             Trigger.ACTION_SILENCE -> silentMode()
+            Trigger.ACTION_MESSAGE -> sendMessage()
             else -> Toast.makeText(this, "triggered but no action", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    //sends message to given number
+    private fun sendMessage() {
+        if (trigger.mobileNumber.isEmpty()) return
+        //send sms
+        SmsManager.getDefault().sendTextMessage("+91"+trigger.mobileNumber,null,trigger.message,null,null)
     }
 
     //one shot

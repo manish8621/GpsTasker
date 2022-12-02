@@ -9,6 +9,7 @@ import com.mk.gpstasker.R
 import com.mk.gpstasker.databinding.ActivityActionBinding
 import com.mk.gpstasker.databinding.FragmentTriggerListenBinding
 import com.mk.gpstasker.model.SERVICE_COMMAND
+import com.mk.gpstasker.model.room.Trigger
 import com.mk.gpstasker.service.TriggerListenService
 import kotlin.system.exitProcess
 
@@ -19,6 +20,19 @@ class ActionActivity : AppCompatActivity() {
         binding = ActivityActionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setOnclickListeners()
+        setInfo()
+    }
+
+    private fun setInfo() {
+        intent?.let {
+            it.getStringExtra(Trigger.ACTION_TYPE)?.let { actionType->
+                when(actionType){
+                    Trigger.ACTION_MESSAGE -> {
+                        binding.msgTv.text = "Message sent"
+                    }
+                }
+            }
+        }
     }
 
 

@@ -30,14 +30,14 @@
                 android:layout_height="50dp"
                 android:padding="10dp"
                 android:background="@drawable/round_cornered_primary_colored"
-
                 android:layout_marginStart="16dp"
                 android:tooltipText="Trigger action"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:src="@drawable/alert_white"
-                android:contentDescription="action" />
+                android:contentDescription="action"
+                app:tint="@color/white" />
 
             <TextView
                 android:id="@+id/location_label_tv"

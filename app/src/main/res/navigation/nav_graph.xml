@@ -40,6 +40,9 @@
         <argument
             android:name="location"
             app:argType="com.mk.gpstasker.model.room.Location" />
+        <action
+            android:id="@+id/action_triggerDetailFragment_to_createMessageFragment"
+            app:destination="@id/createMessageFragment" />
     </fragment>
     <fragment
         android:id="@+id/triggerListenFragment"
@@ -48,5 +51,16 @@
         <argument
             android:name="trigger"
             app:argType="com.mk.gpstasker.model.room.Trigger" />
+    </fragment>
+    <fragment
+        android:id="@+id/createMessageFragment"
+        android:name="com.mk.gpstasker.view.fragments.CreateMessageFragment"
+        android:label="CreateMessageFragment" >
+        <argument
+            android:name="mobileNumber"
+            app:argType="string" />
+        <argument
+            android:name="message"
+            app:argType="string" />
     </fragment>
 </navigation>

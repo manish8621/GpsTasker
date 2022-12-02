@@ -15,6 +15,8 @@ data class Trigger(
     val location:Location,
 
     val triggerAction:String,
+    val mobileNumber:String="",
+    val message:String,
 
     val label:String,
 
@@ -24,8 +26,10 @@ data class Trigger(
 {
     companion object{
 
+        val ACTION_TYPE = "action type"
         val ACTION_SILENCE = "ACTION_SILENCE"
         val ACTION_ALERT = "ACTION_ALERT"
+        val ACTION_MESSAGE = "ACTION_MESSAGE"
         //TODO:Add extra features
         val ACTION_OTHER = "ACTION_?"
 

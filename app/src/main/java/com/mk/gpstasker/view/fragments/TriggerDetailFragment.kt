@@ -9,13 +9,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.mk.gpstasker.App
 import com.mk.gpstasker.R
-import com.mk.gpstasker.databinding.FragmentMapsBinding
 import com.mk.gpstasker.databinding.FragmentTriggerDetailBinding
+import com.mk.gpstasker.model.CREATE_MESSAGE_FRAGMENT_RESULT
+import com.mk.gpstasker.model.MESSAGE_KEY
+import com.mk.gpstasker.model.MOBILE_NUMBER_KEY
 import com.mk.gpstasker.model.room.Trigger
 import com.mk.gpstasker.viewmodel.TriggerDetailViewModel
 import com.mk.gpstasker.viewmodel.TriggersDetailViewModelFactory
@@ -36,7 +39,6 @@ class TriggerDetailFragment : Fragment() {
         val factory = TriggersDetailViewModelFactory((requireActivity().application as App).triggersRepository)
         viewModel = ViewModelProvider(this,factory)[TriggerDetailViewModel::class.java]
         binding.viewModel = viewModel
-
         binding.lifecycleOwner = viewLifecycleOwner
         // Inflate the layout for this fragment
         return binding.root
@@ -45,6 +47,7 @@ class TriggerDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setClickListeners()
+        setOnFragmentResult()
     }
 
     private fun setClickListeners() {
@@ -55,11 +58,16 @@ class TriggerDetailFragment : Fragment() {
             viewModel.triggerAction.value = Trigger.ACTION_ALERT
             selectOption(it as ImageView , binding.alertTv)
             unSelectOption(binding.silentIv, binding.silentTv)
+            unSelectOption(binding.messageIv, binding.messageTv)
         }
         binding.silentIv.setOnClickListener{
             viewModel.triggerAction.value = Trigger.ACTION_SILENCE
             selectOption(it as ImageView , binding.silentTv)
             unSelectOption(binding.alertIv, binding.alertTv)
+            unSelectOption(binding.messageIv, binding.messageTv)
+        }
+        binding.messageIv.setOnClickListener{
+            gotoCreateMessageScreen()
         }
         binding.addBtn.setOnClickListener{
             if(binding.labelEt.toString().isNotEmpty()) {
@@ -70,6 +78,10 @@ class TriggerDetailFragment : Fragment() {
             else
                 Toast.makeText(context, "label is empty", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun gotoCreateMessageScreen() {
+        findNavController().navigate(TriggerDetailFragmentDirections.actionTriggerDetailFragmentToCreateMessageFragment(viewModel.mobileNumber,viewModel.message))
     }
 
     private fun goToTriggersListScreen() {
@@ -89,6 +101,18 @@ class TriggerDetailFragment : Fragment() {
         imageView.background = AppCompatResources.getDrawable(requireContext(),R.drawable.highlight_bg_a)
         textView.setTextColor(requireContext().getColor(R.color.primary_sat_highlight))
     }
-
-
+    private fun setOnFragmentResult() {
+        setFragmentResultListener(CREATE_MESSAGE_FRAGMENT_RESULT) { s: String, bundle: Bundle ->
+            viewModel.mobileNumber = bundle.getString(MOBILE_NUMBER_KEY) ?: return@setFragmentResultListener
+            viewModel.message = bundle.getString(MESSAGE_KEY) ?: return@setFragmentResultListener
+            with(binding) {
+                this@TriggerDetailFragment.viewModel.triggerAction.value = Trigger.ACTION_MESSAGE
+                selectOption(messageIv, messageTv)
+                //show short message
+                binding.messageTv.text = this@TriggerDetailFragment.viewModel.getMessageInfo()
+                unSelectOption(alertIv, alertTv)
+                unSelectOption(silentIv, silentTv)
+            }
+        }
+    }
 }

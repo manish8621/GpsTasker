@@ -193,7 +193,6 @@ class MapsFragment : Fragment() {
                 .position(latLng)
                 .title("Target")
                 .snippet(snippet)
-
         )
         //camera zoom
         if (zoomEnabled)
@@ -224,12 +223,16 @@ class MapsFragment : Fragment() {
         binding.defaultViewBtn.setOnClickListener{
             if (it.tag.toString().isEmpty()){
                 viewModel.mapMode = GoogleMap.MAP_TYPE_NORMAL
+                binding.defaultTv.setTextColor(requireContext().getColor(R.color.black))
+                binding.satiliteTv.setTextColor(requireContext().getColor(R.color.black))
                 updateMapMode()
             }
         }
         binding.satelliteViewBtn.setOnClickListener{
             if (it.tag.toString().isEmpty()){
                 viewModel.mapMode = GoogleMap.MAP_TYPE_HYBRID
+                binding.defaultTv.setTextColor(requireContext().getColor(R.color.white))
+                binding.satiliteTv.setTextColor(requireContext().getColor(R.color.white))
                 updateMapMode()
             }
 
@@ -252,19 +255,20 @@ class MapsFragment : Fragment() {
             //TODO:Into a function
             viewModel.radius.value = value * MaxRadius
         })
+        binding.upBtn.setOnClickListener{
+            findNavController().navigateUp()
+        }
     }
 
     //ui utils to select and unselect options
     private fun unSelectOption(imageView: ImageView, textView: TextView) {
         imageView.tag =""
         imageView.background = null
-        textView.setTextColor(requireContext().getColor(R.color.black))
     }
 
     private fun selectOption(imageView: ImageView, textView: TextView) {
         imageView.tag ="selected"
-        imageView.background = AppCompatResources.getDrawable(requireContext(),R.drawable.highlight_bg_a)
-        textView.setTextColor(requireContext().getColor(R.color.highlight_color))
+        imageView.background = AppCompatResources.getDrawable(requireContext(),R.drawable.rounded_border)
     }
 
 

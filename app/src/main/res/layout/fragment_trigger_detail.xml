@@ -48,7 +48,7 @@
                 style="@style/titleTextLev1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/gps_tasker_listen_to_trigger" />
+                android:text="@string/gps_tasker_add_trigger" />
 
         </androidx.appcompat.widget.Toolbar>
 
@@ -63,6 +63,22 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/startGuide"
             app:layout_constraintTop_toBottomOf="@id/toolbar_tb" />
+        <!--TODO:add material edit text        -->
+        <EditText
+            android:id="@+id/label_et"
+            style="@style/valueText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/trigger_label"
+            android:lines="1"
+            android:inputType="text"
+            android:text="@={viewModel.triggerLabel}"
+            android:textColorHighlight="@color/on_primary"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/endGuide"
+            app:layout_constraintStart_toStartOf="@+id/startGuide"
+            app:layout_constraintTop_toBottomOf="@+id/label_tv"
+            android:autofillHints="Home|Office" />
 
         <TextView
             android:id="@+id/select_trigger_action_tv"
@@ -131,23 +147,30 @@
             app:layout_constraintTop_toBottomOf="@+id/alert_iv" />
 
 
-        <!--TODO:add material edit text        -->
+        <ImageView
+            android:id="@+id/message_iv"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="@string/alert"
+            android:padding="10dp"
+            android:src="@drawable/sms"
+            app:layout_constraintStart_toStartOf="@+id/startGuide"
+            app:layout_constraintTop_toBottomOf="@+id/silent_tv"
+            app:tint="@color/black" />
 
-        <EditText
-            android:id="@+id/label_et"
-            style="@style/valueText"
+        <TextView
+            android:id="@+id/message_tv"
+            style="@style/valueTextSmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/trigger_label"
-            android:lines="1"
-            android:inputType="text"
-            android:text="@={viewModel.triggerLabel}"
-            android:textColorHighlight="@color/on_primary"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toStartOf="@+id/endGuide"
-            app:layout_constraintStart_toStartOf="@+id/startGuide"
-            app:layout_constraintTop_toBottomOf="@+id/label_tv"
-            android:autofillHints="Home|Office" />
+            android:gravity="center"
+            android:text="@string/message"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/message_iv"
+            app:layout_constraintStart_toStartOf="@+id/message_iv"
+            app:layout_constraintTop_toBottomOf="@+id/message_iv" />
+
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/add_btn"

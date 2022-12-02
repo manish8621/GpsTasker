@@ -2,6 +2,7 @@ package com.mk.gpstasker.view.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +21,16 @@ class TriggerAdapter:ListAdapter<Trigger,TriggerAdapter.ItemViewHolder>(Diffutil
                 val binding = TriggerItemLayoutBinding.inflate(layoutInflater,parent,false)
 
                 //add click listeners
+                binding.root.setOnClickListener{root->
+                    binding.trigger?.let {
+                        if(it.mobileNumber.isNotEmpty()){
+                            Toast.makeText(root.context, "sends '${it.message}' to \n ${it.mobileNumber}", Toast.LENGTH_SHORT).show()
+                        }
+                        else
+                            Toast.makeText(root.context, "action : ${it.triggerAction}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
                 binding.actionBtn.setOnClickListener{
                     binding.trigger?.let {
                         clickListeners?.onStartClicked(it)
@@ -43,6 +54,7 @@ class TriggerAdapter:ListAdapter<Trigger,TriggerAdapter.ItemViewHolder>(Diffutil
             when(trigger.triggerAction){
                 Trigger.ACTION_SILENCE -> binding.triggerIv.setImageResource(R.drawable.vibration_white)
                 Trigger.ACTION_ALERT -> binding.triggerIv.setImageResource(R.drawable.alert_white)
+                Trigger.ACTION_MESSAGE -> binding.triggerIv.setImageResource(R.drawable.sms)
                 else -> binding.triggerIv.setImageResource(R.drawable.ic_launcher_foreground)
             }
         }

@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Trigger::class], version = 3)
+@Database(entities = [Trigger::class], version = 4, exportSchema = false)
 abstract class TriggerDatabase: RoomDatabase() {
     abstract val triggersDao:TriggersDao
     companion object{

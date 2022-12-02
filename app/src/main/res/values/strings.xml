@@ -24,4 +24,9 @@
     <string name="task_completed">Task Completed</string>
     <string name="location_reached">Location reached</string>
     <string name="stop">stop</string>
+    <string name="normal_map_mode">normal map mode</string>
+    <string name="message">message</string>
+    <string name="gps_tasker_add_trigger"><![CDATA[GPS Tasker > Add trigger]]></string>
+    <string name="mobile_number">Mobile number</string>
+    <string name="done">done</string>
 </resources>

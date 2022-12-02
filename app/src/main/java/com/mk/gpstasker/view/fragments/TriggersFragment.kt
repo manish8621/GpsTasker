@@ -1,6 +1,7 @@
 package com.mk.gpstasker.view.fragments
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -51,7 +52,7 @@ class TriggersFragment : Fragment() {
                 Snackbar.make(binding.root,R.string.permission_denied_msg, Snackbar.LENGTH_SHORT)
                     .setAction(R.string.grant){
                         viewModel.uiStates.isSentToSettings = true
-                        Toast.makeText(context, "Grant location permission", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Grant permissions", Toast.LENGTH_SHORT).show()
                         goToAppInfo()
                     }
                     .show()
@@ -112,7 +113,15 @@ class TriggersFragment : Fragment() {
 
     //check before continue
     private fun startTriggerListener(trigger: Trigger) {
-        if(requireContext().checkInternet()== INTERNET_AVAILABLE) {
+        //check for trigger action permission
+        if(trigger.triggerAction == Trigger.ACTION_MESSAGE)
+        {
+            if(requireContext().checkSelfPermission(android.Manifest.permission.SEND_SMS)!=PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(android.Manifest.permission.SEND_SMS)
+                return
+            }
+        }
+
             if(locationClient.checkLocationPermission()) {
                 if(locationClient.checkLocationEnabled()){ gotoTriggerListenFragment(trigger,isAlreadyRunning = false) }
                 else {
@@ -130,11 +139,9 @@ class TriggersFragment : Fragment() {
                 }
             }
             else
-            {
                 requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-            }
-        }
-        else Toast.makeText(context, "No Internet", Toast.LENGTH_SHORT).show()
+
+
     }
 
     private fun gotoTriggerListenFragment(trigger: Trigger,isAlreadyRunning:Boolean) {
