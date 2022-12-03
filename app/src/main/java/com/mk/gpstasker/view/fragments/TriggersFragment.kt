@@ -25,6 +25,7 @@ import com.mk.gpstasker.model.INTERNET_AVAILABLE
 import com.mk.gpstasker.model.location.LocationClient
 import com.mk.gpstasker.model.network.checkInternet
 import com.mk.gpstasker.model.room.Trigger
+import com.mk.gpstasker.service.TriggerListenService
 import com.mk.gpstasker.view.adapters.TriggerAdapter
 import com.mk.gpstasker.viewmodel.TriggersViewModel
 import com.mk.gpstasker.viewmodel.TriggersViewModelFactory
@@ -37,7 +38,6 @@ class TriggersFragment : Fragment() {
 
     private lateinit var viewModel: TriggersViewModel
     private lateinit var binding: FragmentTriggersBinding
-    private lateinit var locationClient: LocationClient
     private lateinit var requestPermissionLauncher : ActivityResultLauncher<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +80,6 @@ class TriggersFragment : Fragment() {
 
         //location
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        locationClient = LocationClient(requireContext(),fusedLocationProviderClient)
 
         //recycler view
         val adapter = TriggerAdapter()
@@ -113,17 +112,20 @@ class TriggersFragment : Fragment() {
 
     //check before continue
     private fun startTriggerListener(trigger: Trigger) {
-        //check for trigger action permission
-        if(trigger.triggerAction == Trigger.ACTION_MESSAGE)
+        //check for trigger special action permission
+        when(trigger.triggerAction)
         {
-            if(requireContext().checkSelfPermission(android.Manifest.permission.SEND_SMS)!=PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(android.Manifest.permission.SEND_SMS)
-                return
+            Trigger.ACTION_MESSAGE-> {
+                if (requireContext().checkSelfPermission(android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissionLauncher.launch(android.Manifest.permission.SEND_SMS)
+                    return
+                }
             }
         }
 
-            if(locationClient.checkLocationPermission()) {
-                if(locationClient.checkLocationEnabled()){ gotoTriggerListenFragment(trigger,isAlreadyRunning = false) }
+        //check necessary permissions
+            if(LocationClient.checkLocationPermission(requireContext())) {
+                if(LocationClient.checkLocationEnabled(requireContext())){ gotoTriggerListenFragment(trigger,isAlreadyRunning = false) }
                 else {
                     Snackbar.make(
                         binding.root,
@@ -138,10 +140,7 @@ class TriggersFragment : Fragment() {
                         .show()
                 }
             }
-            else
-                requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-
-
+            else requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
     private fun gotoTriggerListenFragment(trigger: Trigger,isAlreadyRunning:Boolean) {
@@ -175,6 +174,9 @@ class TriggersFragment : Fragment() {
                     //checks if trigger is already in background
                     if(viewModel.uiStates.isSentToTriggerListenFragment.not() && it.first().onGoing)
                         gotoTriggerListenFragment(trigger = it.first(), isAlreadyRunning = true)
+                    else
+                        //check if service running
+                         if (TriggerListenService.isRunning)requireContext().stopService(Intent(requireContext(), TriggerListenService::class.java))
                     hideStatus()
                 }
                 adapter.submitList(it)

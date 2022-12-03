@@ -117,7 +117,7 @@ class MapsFragment : Fragment() {
 
         //location client
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        locationClient = LocationClient(requireContext(), fusedLocationProviderClient)
+        locationClient = LocationClient( fusedLocationProviderClient)
 
 
 
@@ -293,8 +293,8 @@ class MapsFragment : Fragment() {
         //TODO: network check
         if(true)
         {
-            if (locationClient.checkLocationPermission()) {
-                if (locationClient.checkLocationEnabled()) {
+            if (LocationClient.checkLocationPermission(requireContext())) {
+                if (LocationClient.checkLocationEnabled(requireContext())) {
                     return true
                 } else {
                     Snackbar.make(
@@ -321,7 +321,7 @@ class MapsFragment : Fragment() {
 
     //location updates starts here
     private fun getLocationUpdates() {
-        locationClient.getCurrentLocationUpdates(oneShot = true){
+        locationClient.getCurrentLocationUpdates(requireContext(),oneShot = true){
             viewModel.updateLatLng(LatLng(it.latitude,it.longitude))
         }
     }

@@ -42,6 +42,9 @@ class CreateMessageFragment : Fragment() {
     }
 
     private fun setOnclickListeners() {
+        binding.upBtn.setOnClickListener{
+            findNavController().navigateUp()
+        }
         binding.doneBtn.setOnClickListener{
 
             binding.mobileNumberEt.text?.let { mob->

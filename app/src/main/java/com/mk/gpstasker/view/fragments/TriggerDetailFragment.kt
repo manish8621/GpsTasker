@@ -1,18 +1,27 @@
 package com.mk.gpstasker.view.fragments
 
+import android.content.DialogInterface
 import android.os.Bundle
+import android.text.InputType
+import android.text.PrecomputedText.Params
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout.LayoutParams
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.marginStart
+import androidx.core.view.setMargins
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mk.gpstasker.App
 import com.mk.gpstasker.R
 import com.mk.gpstasker.databinding.FragmentTriggerDetailBinding
@@ -61,11 +70,12 @@ class TriggerDetailFragment : Fragment() {
             unSelectOption(binding.messageIv, binding.messageTv)
         }
         binding.silentIv.setOnClickListener{
+            Toast.makeText(context, "Puts phone into silent mode", Toast.LENGTH_SHORT).show()
             viewModel.triggerAction.value = Trigger.ACTION_SILENCE
             selectOption(it as ImageView , binding.silentTv)
             unSelectOption(binding.alertIv, binding.alertTv)
-            unSelectOption(binding.messageIv, binding.messageTv)
         }
+
         binding.messageIv.setOnClickListener{
             gotoCreateMessageScreen()
         }
@@ -79,6 +89,8 @@ class TriggerDetailFragment : Fragment() {
                 Toast.makeText(context, "label is empty", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 
     private fun gotoCreateMessageScreen() {
         findNavController().navigate(TriggerDetailFragmentDirections.actionTriggerDetailFragmentToCreateMessageFragment(viewModel.mobileNumber,viewModel.message))

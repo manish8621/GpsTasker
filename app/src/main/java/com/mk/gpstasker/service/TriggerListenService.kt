@@ -1,6 +1,7 @@
 package com.mk.gpstasker.service
 
 import android.app.Application
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
@@ -9,6 +10,7 @@ import android.location.Location
 import android.media.AudioManager
 import android.media.Ringtone
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.IBinder
 import android.telephony.SmsManager
 import android.widget.Toast
@@ -53,7 +55,7 @@ class TriggerListenService: Service() {
         //init all
         initLocationClient()
         initNotification()
-        startInForeground()
+        startForeground(NOTIFICATION_ID,notificationBuilder.build())
         repository = (application as App).triggersRepository
         serviceRunning = true
     }
@@ -62,10 +64,6 @@ class TriggerListenService: Service() {
         //init pending intents for notification
         Intent(this,MainActivity::class.java).also {
             activityPendingIntent = PendingIntent.getActivity(this,PENDING_INTENT_REQ_CODE_ACT,it,PendingIntent.FLAG_IMMUTABLE)
-        }
-        Intent(this,TriggerListenService::class.java).also {
-            it.action =  EXIT_PROCESS
-            exitPendingIntent = PendingIntent.getService(this, PENDING_INTENT_REQ_CODE_SER,it,PendingIntent.FLAG_IMMUTABLE)
         }
 
         notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHN_ID)
@@ -96,44 +94,35 @@ class TriggerListenService: Service() {
                     START_GPS -> startGPS()
                     STOP_GPS -> stopGPS()
                     STOP_SERVICE -> stopServ()
-                    EXIT_PROCESS -> stopServ()
                 }
                 command = newCommand
             }
         }
-
-        //TODO:try non sticky
+        //TODO:see when dies
         return START_NOT_STICKY
-    }
-
-    private fun startInForeground() {
-        startForeground(NOTIFICATION_ID,notificationBuilder.build())
     }
 
     //init functions
     private fun initLocationClient() {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        locationClient = LocationClient(this, fusedLocationProviderClient)
+        locationClient = LocationClient( fusedLocationProviderClient)
     }
 
     //starts getting current location
     //has the on success callback
     private fun startGPS() {
         if(command == START_SERVICE || command== STOP_GPS){
-            locationClient.getCurrentLocationUpdates(oneShot = false) {
+            locationClient.getCurrentLocationUpdates(applicationContext,oneShot = false) {
                 sendLocation(it)
                 if (isNearDestination(LatLng(it.latitude,it.longitude))) onTriggerSuccess()
             }
-
         }
     }
 
 
     //stops getting current location
     private fun stopGPS() {
-        if(command == START_GPS) {
             locationClient.stopLocationUpdates()
-        }
     }
 
     //updates trigger status as not running
@@ -144,11 +133,6 @@ class TriggerListenService: Service() {
     }
 
 
-
-    private fun quitApp(){
-        stopServ()
-    }
-
     //stops the current service and all the operations running by it
     private fun stopServ(){
         serviceRunning = false
@@ -156,6 +140,8 @@ class TriggerListenService: Service() {
         stopAlert()
         showServiceStoppedNotification()
         stopForeground(true)
+        //make all null
+
         stopSelf()
     }
 
@@ -186,17 +172,27 @@ class TriggerListenService: Service() {
             doAction()
             sendTriggerSuccess()
             showTriggerSuccessNotification()
+            //no need to keep service
+//            if(trigger.triggerAction!= Trigger.ACTION_ALERT) stopServ()
         }
     }
 
     private fun showTriggerSuccessNotification() {
+        Intent(this,TriggerListenService::class.java).also {
+            it.action =  STOP_SERVICE
+            exitPendingIntent = PendingIntent.getService(this, PENDING_INTENT_REQ_CODE_SER,it,PendingIntent.FLAG_IMMUTABLE)
+        }
+
         notificationBuilder.setContentTitle("GPS Tasker - task completed")
             .setContentText("tap to clear")
             .setContentIntent(exitPendingIntent)
             .clearActions()
-            .setAutoCancel(true)
+            .setAutoCancel(false)
 
-        startForeground(NOTIFICATION_ID,notificationBuilder.build())
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(NOTIFICATION_ID,notificationBuilder.build())
+//        startForeground(NOTIFICATION_ID,notificationBuilder.build())
     }
 
     private fun showServiceStoppedNotification() {
@@ -244,6 +240,7 @@ class TriggerListenService: Service() {
         }
     }
 
+
     //sends message to given number
     private fun sendMessage() {
         if (trigger.mobileNumber.isEmpty()) return
@@ -267,7 +264,7 @@ class TriggerListenService: Service() {
         ringtone.play()
     }
 
-    fun stopAlert(){
+    private fun stopAlert(){
         if(::ringtone.isInitialized && ringtone.isPlaying)
             ringtone.stop()
     }
@@ -285,7 +282,6 @@ class TriggerListenService: Service() {
         //command
         const val START_SERVICE = "start service"
         const val STOP_SERVICE = "Stop service"
-        const val EXIT_PROCESS = "exit process"
         const val START_GPS = "start gps"
         const val STOP_GPS = "stop gps"
         const val LOCATION_SENT = 1

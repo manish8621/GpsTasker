@@ -139,12 +139,11 @@ class TriggerListenFragment : Fragment() {
         mapFragment?.getMapAsync(callback)
         //location client
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        locationClient = LocationClient(requireContext(), fusedLocationProviderClient)
 
 
         setUpObservers()
         setonClickListeners()
-        registerLocationReceiver()
+
     }
 
     private fun registerLocationReceiver() {
@@ -161,6 +160,7 @@ class TriggerListenFragment : Fragment() {
 
         //start net monitor
         networkUtil.registerNetworkCallback()
+        registerLocationReceiver()
         //TODO : replace with function for ui states
         if(viewModel.uiStates.isSentToSettings) {
             viewModel.uiStates.isSentToSettings = false
@@ -276,8 +276,8 @@ class TriggerListenFragment : Fragment() {
     //if they no snack bar will be shown they can use that to go settings
     private fun locationUsable(): Boolean {
 
-            if (locationClient.checkLocationPermission()) {
-                if (locationClient.checkLocationEnabled()) {
+            if (LocationClient.checkLocationPermission(requireContext())) {
+                if (LocationClient.checkLocationEnabled(requireContext())) {
                     return true
                 } else {
                     Snackbar.make(
@@ -437,11 +437,11 @@ class TriggerListenFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         networkUtil.unregisterNetworkCallback()
+        unRegisterLocationReceiver()
     }
 
     //stop if any location updates
     override fun onDestroy() {
         super.onDestroy()
-        unRegisterLocationReceiver()
     }
 }

@@ -23,11 +23,16 @@ class TriggerAdapter:ListAdapter<Trigger,TriggerAdapter.ItemViewHolder>(Diffutil
                 //add click listeners
                 binding.root.setOnClickListener{root->
                     binding.trigger?.let {
-                        if(it.mobileNumber.isNotEmpty()){
-                            Toast.makeText(root.context, "sends '${it.message}' to \n ${it.mobileNumber}", Toast.LENGTH_SHORT).show()
+
+                        when(it.triggerAction){
+                            Trigger.ACTION_MESSAGE -> "sends '${it.message}' to \n ${it.mobileNumber}"
+                            Trigger.ACTION_SILENCE -> "puts mobile into silent mode"
+                            Trigger.ACTION_ALERT -> "alerts when the location reached"
+                            else -> "error unknown trigger"
+                        }.also { text ->
+                            Toast.makeText(root.context, text, Toast.LENGTH_SHORT).show()
                         }
-                        else
-                            Toast.makeText(root.context, "action : ${it.triggerAction}", Toast.LENGTH_SHORT).show()
+
                     }
                 }
 
