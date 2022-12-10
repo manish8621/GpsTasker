@@ -173,6 +173,12 @@ class HomeFragment : Fragment() {
     private fun checkLocationPermission(): Boolean {
         return requireActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
+    private fun checkBackgroundLocationPermission(): Boolean {
+        return  if(Build.VERSION.SDK_INT >=29)
+                    requireActivity().checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+                else
+                    true
+    }
 
 
     override fun onDestroy() {

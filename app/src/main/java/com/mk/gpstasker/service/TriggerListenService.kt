@@ -13,6 +13,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.IBinder
 import android.telephony.SmsManager
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.viewModelScope
@@ -31,6 +32,12 @@ import kotlinx.coroutines.*
 import kotlin.system.exitProcess
 
 class TriggerListenService: Service() {
+    //debug
+    val job = Job()
+    val coroutineScope = CoroutineScope(Dispatchers.IO+job)
+    var i = 0;
+
+
     //command is used to track the current status of service
     var command = START_SERVICE
 
@@ -53,19 +60,38 @@ class TriggerListenService: Service() {
     override fun onCreate() {
         super.onCreate()
         //init all
+        initPendingIntents()
         initLocationClient()
         initNotification()
         startForeground(NOTIFICATION_ID,notificationBuilder.build())
         repository = (application as App).triggersRepository
         serviceRunning = true
+        startDebug()
     }
 
-    private fun initNotification() {
-        //init pending intents for notification
+    private fun startDebug() {
+        coroutineScope.launch {
+            while (true){
+                Log.i("TAG", "service alive ${i++}")
+                delay(500L)
+            }
+        }
+    }
+
+    private fun initPendingIntents() {
+        //init pending intents for notification to enter app
         Intent(this,MainActivity::class.java).also {
             activityPendingIntent = PendingIntent.getActivity(this,PENDING_INTENT_REQ_CODE_ACT,it,PendingIntent.FLAG_IMMUTABLE)
         }
+        //init pending intents for notification to exit service
+        Intent(this,TriggerListenService::class.java).also {
+            it.action = STOP_SERVICE
+            exitPendingIntent = PendingIntent.getService(this,
+                PENDING_INTENT_REQ_CODE_SER,it,PendingIntent.FLAG_IMMUTABLE)
+        }
+    }
 
+    private fun initNotification() {
         notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHN_ID)
             .setSmallIcon(R.drawable.gps_ico)
             .setContentTitle("GPS Tasker")
@@ -135,6 +161,7 @@ class TriggerListenService: Service() {
 
     //stops the current service and all the operations running by it
     private fun stopServ(){
+        Log.i("TAG", "stopServ: ")
         serviceRunning = false
         stopGPS()
         stopAlert()
@@ -183,6 +210,7 @@ class TriggerListenService: Service() {
             exitPendingIntent = PendingIntent.getService(this, PENDING_INTENT_REQ_CODE_SER,it,PendingIntent.FLAG_IMMUTABLE)
         }
 
+        //TODO:Show user what was the trigger action
         notificationBuilder.setContentTitle("GPS Tasker - task completed")
             .setContentText("tap to clear")
             .setContentIntent(exitPendingIntent)
@@ -198,10 +226,11 @@ class TriggerListenService: Service() {
     private fun showServiceStoppedNotification() {
         notificationBuilder.setContentTitle("GPS Tasker")
             .setContentText("service stopped")
-            .setContentIntent(exitPendingIntent)
+            .setContentIntent(null)
             .clearActions()
             .setAutoCancel(true)
-        startForeground(NOTIFICATION_ID,notificationBuilder.build())
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(NOTIFICATION_ID,notificationBuilder.build())
     }
 
     //broadcasts the location
@@ -213,10 +242,11 @@ class TriggerListenService: Service() {
         intent.putExtra(DISTANCE, distance.toFloat())
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        Log.i("TAG", "sendLocation: ")
     }
 
     //computations
-    fun isNearDestination(currentLocation: LatLng):Boolean{
+    private fun isNearDestination(currentLocation: LatLng):Boolean{
         //TODO:naming conv
         if(::trigger.isInitialized){
             with(trigger.location) {
@@ -290,6 +320,8 @@ class TriggerListenService: Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        job.cancel()
+        Log.i("TAG", "onDestroy:service ")
     }
 
     override fun onBind(intent: Intent?): IBinder? {

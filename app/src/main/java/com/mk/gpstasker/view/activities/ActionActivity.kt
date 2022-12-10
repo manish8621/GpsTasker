@@ -44,9 +44,8 @@ class ActionActivity : AppCompatActivity() {
     }
 
     private fun stopTriggerListenService(){
-//        val intent = Intent(this,TriggerListenService::class.java)
-//        intent.action = TriggerListenService.STOP_SERVICE
-//        startService(intent)
-        stopService(Intent(this,TriggerListenService::class.java))
+        val intent = Intent(this,TriggerListenService::class.java)
+        intent.action = TriggerListenService.STOP_SERVICE
+        startService(intent)
     }
 }

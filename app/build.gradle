@@ -61,15 +61,19 @@ dependencies {
 
     //location
     implementation("com.google.android.gms:play-services-location:21.0.1")
-
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
 
     //caRD
     implementation("androidx.cardview:cardview:1.0.0")
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
 
+    //splash
+    implementation("androidx.core:core-splashscreen:1.0.0")
 
 
+
+    // debugImplementation because LeakCanary should only run in debug builds.
+//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'

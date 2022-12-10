@@ -1,11 +1,14 @@
 package com.mk.gpstasker.view.fragments
 
+import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.getSystemService
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.LocationServices
@@ -21,6 +25,7 @@ import com.mk.gpstasker.App
 import com.mk.gpstasker.BuildConfig
 import com.mk.gpstasker.R
 import com.mk.gpstasker.databinding.FragmentTriggersBinding
+import com.mk.gpstasker.databinding.PermissionRequestLayoutBinding
 import com.mk.gpstasker.model.INTERNET_AVAILABLE
 import com.mk.gpstasker.model.location.LocationClient
 import com.mk.gpstasker.model.network.checkInternet
@@ -110,6 +115,8 @@ class TriggersFragment : Fragment() {
     }
 
 
+    @SuppressLint("InlinedApi")
+    //api version was checked already in checked in LocationClient.checkBackgroundLocationPermission fun
     //check before continue
     private fun startTriggerListener(trigger: Trigger) {
         //check for trigger special action permission
@@ -117,15 +124,27 @@ class TriggersFragment : Fragment() {
         {
             Trigger.ACTION_MESSAGE-> {
                 if (requireContext().checkSelfPermission(android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissionLauncher.launch(android.Manifest.permission.SEND_SMS)
+                    showPermissionAlert(android.Manifest.permission.SEND_SMS)
                     return
                 }
             }
         }
 
+
         //check necessary permissions
-            if(LocationClient.checkLocationPermission(requireContext())) {
-                if(LocationClient.checkLocationEnabled(requireContext())){ gotoTriggerListenFragment(trigger,isAlreadyRunning = false) }
+            if(!LocationClient.checkLocationPermission(requireContext())) {
+                showPermissionAlert(android.Manifest.permission.ACCESS_FINE_LOCATION)
+                return
+            }
+
+
+                if(LocationClient.checkLocationEnabled(requireContext())){
+                    if(!LocationClient.checkBackgroundLocationPermission(requireContext())){
+                        showPermissionAlert(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                        return
+                    }
+                    gotoTriggerListenFragment(trigger,isAlreadyRunning = false)
+                }
                 else {
                     Snackbar.make(
                         binding.root,
@@ -139,8 +158,62 @@ class TriggersFragment : Fragment() {
                         }
                         .show()
                 }
+    }
+
+
+    /**
+     * shows a alert dialog and explains the message that why app needs the permission
+     * */
+    private fun showPermissionAlert(permission:String) {
+
+        //get message related for that permission
+        var msg =""
+        var title =""
+        var drawableId = R.drawable.gps_ico
+        when(permission){
+            android.Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
+                msg = getString(R.string.background_location_permission_msg)
+                drawableId = R.drawable.antena
+                title = "Background location permission"
             }
-            else requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+            android.Manifest.permission.ACCESS_FINE_LOCATION -> {
+                msg = getString(R.string.location_permission_msg)
+                title = "Location permission"
+                drawableId = R.drawable.ic_baseline_my_location
+            }
+            android.Manifest.permission.SEND_SMS -> {
+                msg = getString(R.string.message_permission_msg)
+                title = "Sms permission"
+                drawableId = R.drawable.msg_with_bg
+            }
+            else-> throw IllegalArgumentException("invalid permission check the permission string value")
+        }
+
+
+        val permissionReqView = PermissionRequestLayoutBinding.inflate(layoutInflater)
+        permissionReqView.bannerIv.setImageResource(drawableId)
+        permissionReqView.messageTv.text = msg
+
+        AlertDialog.Builder(requireContext())
+            .setIcon(R.drawable.gps_ico)
+            .setTitle(title)
+            .setView(permissionReqView.root)
+            .setPositiveButton("Allow") { _, _ ->
+                if(requireActivity().shouldShowRequestPermissionRationale(permission)){
+                    requestPermissionLauncher.launch(permission)
+                }
+                else {
+                    //if prompt wont show
+                    viewModel.uiStates.isSentToSettings = true
+                    goToAppInfo()
+                }
+            }
+            .setNegativeButton("Ignore") { dialog, _ ->
+                dialog.cancel()
+                //app can work without this permission so allow the user to continue
+                if (permission == android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                    gotoTriggerListenFragment(viewModel.lastSelectedTrigger!!, false)
+            }.show()
     }
 
     private fun gotoTriggerListenFragment(trigger: Trigger,isAlreadyRunning:Boolean) {

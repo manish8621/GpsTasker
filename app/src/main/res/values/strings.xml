@@ -30,4 +30,7 @@
     <string name="mobile_number">Mobile number</string>
     <string name="done">done</string>
     <string name="call">call</string>
+    <string name="background_location_permission_msg">please consider clicking "Allow all the time" while giving permission to location access.\Otherwise app will not able check location in background</string>
+    <string name="location_permission_msg">Location permission is necessary for the app to fetch your location and check if you reached the target location</string>
+    <string name="message_permission_msg">The trigger that you want to start will send message when you reach the target location.\nSo message permission is necessary for the app to send message</string>
 </resources>

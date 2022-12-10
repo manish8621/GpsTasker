@@ -79,10 +79,11 @@ class TriggerDetailFragment : Fragment() {
         binding.messageIv.setOnClickListener{
             gotoCreateMessageScreen()
         }
+
         binding.addBtn.setOnClickListener{
-            if(binding.labelEt.toString().isNotEmpty()) {
+            if(binding.labelEt.text.toString().isNotEmpty() && binding.labelEt.text.toString().isNotBlank()) {
                 viewModel.addTrigger(args.location)
-                Toast.makeText(context, "trigger added", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "trigger added ${binding.labelEt.text}", Toast.LENGTH_SHORT).show()
                 goToTriggersListScreen()
             }
             else

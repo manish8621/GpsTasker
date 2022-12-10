@@ -19,28 +19,29 @@
             android:id="@+id/toolbar_tb"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            >
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageButton
                 android:id="@+id/up_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="?attr/homeAsUpIndicator"
-                android:backgroundTint="@color/primary"
-                android:padding="0dp"
                 android:layout_marginEnd="16dp"
-                android:contentDescription="@string/up_button" />
+                android:backgroundTint="@color/primary"
+                android:contentDescription="@string/up_button"
+                android:padding="0dp"
+                app:srcCompat="?attr/homeAsUpIndicator" />
+
             <ImageView
                 android:id="@+id/app_ico_iv"
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:src="@drawable/gps_ico"
                 android:layout_marginEnd="16dp"
-                android:contentDescription="@string/app_icon" />
+                android:contentDescription="@string/app_icon"
+                android:src="@drawable/gps_ico" />
+
             <TextView
                 android:id="@+id/title_tv"
                 style="@style/titleTextLev1"
@@ -55,10 +56,10 @@
             android:id="@+id/title_map_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="map"
+            android:text="Map"
             android:textColor="@color/black"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/no_internet_cl" />
 
@@ -67,22 +68,79 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/distance"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/trigger_action_tv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title_map_tv"
             tools:context=".view.fragments.MapsFragment" />
 
+
         <TextView
-            android:id="@+id/distance"
+            android:id="@+id/distance_title_tv"
+            style="@style/valueText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
+            android:layout_marginEnd="16dp"
+            android:padding="5dp"
+            android:text="distance"
+            app:layout_constraintBottom_toBottomOf="@+id/trigger_action_tv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/trigger_action_tv" />
+
+        <TextView
+            android:id="@+id/distance_value_tv"
+            style="@style/valueTextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            app:layout_constraintBottom_toBottomOf="@+id/trigger_action_iv"
+            app:layout_constraintEnd_toEndOf="@+id/distance_title_tv"
+            app:layout_constraintStart_toStartOf="@+id/distance_title_tv"
+            app:layout_constraintTop_toBottomOf="@+id/trigger_action_tv"
+            tools:text="1.2km" />
+
+        <TextView
+            android:id="@+id/trigger_action_tv"
+            style="@style/titleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:padding="5dp"
+            app:layout_constraintBottom_toTopOf="@+id/trigger_action_iv"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="423dp"
+            android:text="Trigger action" />
+
+
+        <ImageView
+            android:id="@+id/trigger_action_iv"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="15dp"
+            android:src="@drawable/alert"
+            app:tint="@color/primary_sat_highlight"
+            app:layout_constraintBottom_toTopOf="@+id/task_completed_tv"
+            app:layout_constraintEnd_toEndOf="@+id/trigger_action_tv"
+            app:layout_constraintStart_toStartOf="@+id/trigger_action_tv" />
+
+        <TextView
+            android:id="@+id/task_completed_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary_sat_highlight"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/task_completed"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:drawableStartCompat="@drawable/ic_baseline_done"
+            app:drawableTint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
-
 
         <include
             android:id="@+id/no_internet_cl"
@@ -91,6 +149,13 @@
             android:layout_height="0dp"
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/toolbar_tb" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/trigger_info_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:constraint_referenced_ids="distance_value_tv,trigger_action_tv,trigger_action_iv,distance_title_tv" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

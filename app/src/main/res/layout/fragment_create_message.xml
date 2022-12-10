@@ -76,7 +76,7 @@
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
-
+<!--TODO:Add multiline support-->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/message_layout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -117,7 +117,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="32dp"
-            android:src="@drawable/sms"
+            android:src="@drawable/msg_with_bg"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar_tb" />

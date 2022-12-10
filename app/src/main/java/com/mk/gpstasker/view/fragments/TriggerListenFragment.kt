@@ -92,10 +92,7 @@ class TriggerListenFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(this){
-            if(viewModel.uiStates.taskCompleted.not()) showAlertDialog("Stop the trigger")
-            else goBack()
-        }
+
         //permission handle
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){
                 isGranted -> run {
@@ -110,6 +107,11 @@ class TriggerListenFragment : Fragment() {
                     .show()
             }
         }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(this){
+            if(viewModel.uiStates.taskCompleted.not()) showAlertDialog("Stop the trigger")
+            else goBack()
         }
     }
 
@@ -137,13 +139,35 @@ class TriggerListenFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
-        //location client
-        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
 
         setUpObservers()
         setonClickListeners()
+        showTriggerAction()
 
+    }
+
+    private fun showTriggerAction() {
+        var triggerDetail = args.trigger.triggerAction
+        binding.triggerActionIv.setImageResource(
+            when(args.trigger.triggerAction){
+                Trigger.ACTION_ALERT -> {
+                    triggerDetail = "alerts when location is reached"
+                    R.drawable.alert
+                }
+                Trigger.ACTION_SILENCE -> {
+                    triggerDetail = "turns silent mode on \nwhen location is reached"
+                    R.drawable.ic_baseline_vibration_24
+                }
+                Trigger.ACTION_MESSAGE -> {
+                    triggerDetail = "sends ${args.trigger.message} to ${args.trigger.mobileNumber} \n when location is reached"
+                    R.drawable.sms
+                }
+                else -> androidx.core.R.drawable.notification_bg_normal
+            }
+        )
+        binding.triggerActionIv.setOnClickListener{
+            Toast.makeText(context, triggerDetail, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun registerLocationReceiver() {
@@ -196,6 +220,9 @@ class TriggerListenFragment : Fragment() {
                 else
                     showNoInternetLayout()
             }
+        }
+        binding.taskCompletedTv.setOnClickListener{
+            goBack()
         }
     }
 
@@ -314,7 +341,7 @@ class TriggerListenFragment : Fragment() {
     private fun onTaskCompleted() {
         viewModel.uiStates.taskCompleted = true
         stopGPSService()
-        binding.distance.text = getString(R.string.task_completed)
+        binding.taskCompletedTv.visibility = View.VISIBLE
     }
     //stops all operations
     private fun stopTriggerListening() {
@@ -329,8 +356,8 @@ class TriggerListenFragment : Fragment() {
     private fun showDistance() {
         //print distance on screen
         viewModel.currentLocation.value?.let {
-            ("distance : " + viewModel.distance.format(3)+" km").also { dist->
-                binding.distance.text = dist
+            (viewModel.distance.format(3)+" km").also { dist->
+                binding.distanceValueTv.text = dist
             }
         }
     }
@@ -344,7 +371,6 @@ class TriggerListenFragment : Fragment() {
             .setMessage("Are you sure ?")
             .setPositiveButton("Yes"
             ) { _, _ ->
-                stopTriggerListening()
                 goBack()
             }
             .setNegativeButton("no") { dialog, _ ->
@@ -404,6 +430,7 @@ class TriggerListenFragment : Fragment() {
         intent.action = TriggerListenService.STOP_GPS
         requireContext().startService(intent)
     }
+
     private fun stopTriggerListenService(){
         val intent = Intent(requireContext(),TriggerListenService::class.java)
         intent.action = TriggerListenService.STOP_SERVICE

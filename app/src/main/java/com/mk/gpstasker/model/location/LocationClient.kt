@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import com.google.android.gms.location.*
 import com.mk.gpstasker.model.GPS_UPDATE_INTERVEL
 
@@ -19,7 +20,12 @@ class LocationClient(private val fusedLocationProviderClient: FusedLocationProvi
                 LocationManager.NETWORK_PROVIDER
             )
         }
-
+        fun checkBackgroundLocationPermission(context: Context): Boolean {
+            return  if(Build.VERSION.SDK_INT >=29)
+                context.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+            else
+                true
+        }
         fun checkLocationPermission(context: Context): Boolean {
             return context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         }

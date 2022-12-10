@@ -53,8 +53,9 @@ class TriggerAdapter:ListAdapter<Trigger,TriggerAdapter.ItemViewHolder>(Diffutil
         fun bind(trigger:Trigger)
         {
             binding.trigger = trigger
-            binding.latitudeTv.text = trigger.location.latitude.format(3)
-            binding.longitudeTv.text = trigger.location.longitude.format(3)
+//            binding.latitudeTv.text = trigger.location.latitude.format(3)
+//            binding.longitudeTv.text = trigger.location.longitude.format(3)
+            (trigger.location.radius.format(2) + " km").also { binding.radiusValueTv.text = it }
 
             when(trigger.triggerAction){
                 Trigger.ACTION_SILENCE -> binding.triggerIv.setImageResource(R.drawable.vibration_white)

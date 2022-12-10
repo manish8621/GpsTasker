@@ -51,12 +51,33 @@
                 tools:text="Zoho" />
 
             <TextView
+                android:id="@+id/radius_label_tv"
+                style="@style/titleTextSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Trigger radius"
+                app:layout_constraintStart_toEndOf="@+id/trigger_iv"
+                app:layout_constraintTop_toTopOf="@+id/guideline3" />
+
+            <TextView
+                android:id="@+id/radius_value_tv"
+                style="@style/valueTextSmall"
+                android:textColor="#A4414865"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="12 km"
+                android:layout_marginStart="8dp"
+                app:layout_constraintStart_toEndOf="@id/radius_label_tv"
+                app:layout_constraintTop_toTopOf="@+id/radius_label_tv" />
+<TextView
                 android:id="@+id/latitude_label_tv"
                 style="@style/titleTextSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="Latitude"
+    android:visibility="gone"
                 app:layout_constraintStart_toEndOf="@+id/trigger_iv"
                 app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
@@ -66,6 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0.0"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@+id/longitude_tv"
                 app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
@@ -75,6 +97,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Longitude"
+                android:visibility="gone"
                 android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/divider"
                 app:layout_constraintStart_toStartOf="@+id/latitude_label_tv"
@@ -87,6 +110,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="0.0"
+                android:visibility="gone"
                 app:layout_constraintStart_toEndOf="@+id/longitude_label_tv"
                 app:layout_constraintTop_toTopOf="@+id/longitude_label_tv" />
 
